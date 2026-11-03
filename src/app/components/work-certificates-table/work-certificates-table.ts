@@ -2,11 +2,13 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   input,
   output,
   Pipe,
   type PipeTransform,
   signal,
+  untracked,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -71,6 +73,17 @@ export class WorkCertificatesTable {
 
   private readonly filterValues = toSignal(this.filters.valueChanges, {
     initialValue: this.filters.getRawValue(),
+  });
+  private readonly pruneSelection = effect(() => {
+    const validIds = new Set(this.certificates().map(({ id }) => id));
+
+    untracked(() => {
+      this.selectedIds.update((current) => {
+        const next = new Set([...current].filter((id) => validIds.has(id)));
+
+        return next.size === current.size ? current : next;
+      });
+    });
   });
 
   protected readonly filteredCertificates = computed(() => {
@@ -186,11 +199,6 @@ export class WorkCertificatesTable {
   }
 
   protected requestDelete(certificate: WorkCertificate): void {
-    this.selectedIds.update((current) => {
-      const next = new Set(current);
-      next.delete(certificate.id);
-      return next;
-    });
     this.deleteRequested.emit(certificate);
   }
 
