@@ -5,11 +5,71 @@
       (deleteRequested)="handleDelete($event)"
       (editRequested)="handleEdit($event)"
     />
-
-    <p class="action-status" role="status" aria-live="polite">
-      @if (editTarget(); as certificate) {
-        Ready to edit {{ certificate.machineName }} ({{ certificate.inventoryNumber }}).
-      }
-    </p>
   </main>
+
+  <ng-template
+    [tuiDialog]="editDialogOpen()"
+    [tuiDialogOptions]="editDialogOptions"
+    (tuiDialogChange)="handleEditDialogChange($event)"
+  >
+    <form class="edit-form" [formGroup]="editForm" (ngSubmit)="saveCertificate()">
+      <label class="edit-field">
+        <span>Date</span>
+        <tui-textfield>
+          <input
+            aria-label="Certificate date"
+            formControlName="date"
+            required
+            tuiInput
+            type="date"
+          />
+        </tui-textfield>
+      </label>
+
+      <label class="edit-field">
+        <span>Machine name</span>
+        <tui-textfield>
+          <input
+            aria-label="Certificate machine name"
+            formControlName="machineName"
+            required
+            tuiInput
+          />
+        </tui-textfield>
+      </label>
+
+      <label class="edit-field">
+        <span>Inventory number</span>
+        <tui-textfield>
+          <input
+            aria-label="Certificate inventory number"
+            formControlName="inventoryNumber"
+            required
+            tuiInput
+          />
+        </tui-textfield>
+      </label>
+
+      <label class="edit-field">
+        <span>Employees</span>
+        <tui-textfield>
+          <input
+            aria-describedby="employees-hint"
+            aria-label="Certificate employees"
+            formControlName="employees"
+            required
+            tuiInput
+          />
+        </tui-textfield>
+        <small id="employees-hint">Separate multiple employees with commas.</small>
+      </label>
+
+      <footer class="edit-actions">
+        <button appearance="secondary" tuiButton type="button" (click)="closeEditDialog()">
+          Cancel
+        </button>
+        <button tuiButton type="submit" [disabled]="editForm.invalid">Save</button>
+      </footer>
+    </form>
+  </ng-template>
 </tui-root>

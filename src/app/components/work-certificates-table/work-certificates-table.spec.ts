@@ -127,17 +127,43 @@ describe('WorkCertificatesTable', () => {
     expect(element.textContent).toContain('1 selected');
   });
 
+  it('prunes selection after a selected certificate is removed', async () => {
+    const rowCheckbox = element.querySelector<HTMLInputElement>(
+      '[aria-label="Select Industrial lathe"]',
+    );
+
+    rowCheckbox!.checked = true;
+    rowCheckbox!.dispatchEvent(new Event('change', { bubbles: true }));
+    fixture.detectChanges();
+    expect(element.textContent).toContain('1 selected');
+
+    fixture.componentRef.setInput('certificates', [CERTIFICATES[0]]);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(element.textContent).toContain('0 selected');
+  });
+
   it('emits the corresponding certificate for edit and delete actions', () => {
     const edited: WorkCertificate[] = [];
     const deleted: WorkCertificate[] = [];
     fixture.componentInstance.editRequested.subscribe((certificate) => edited.push(certificate));
     fixture.componentInstance.deleteRequested.subscribe((certificate) => deleted.push(certificate));
 
+    const rowCheckbox = element.querySelector<HTMLInputElement>(
+      '[aria-label="Select Industrial lathe"]',
+    );
+    rowCheckbox!.checked = true;
+    rowCheckbox!.dispatchEvent(new Event('change', { bubbles: true }));
+    fixture.detectChanges();
+
     element.querySelector<HTMLButtonElement>('[aria-label="Edit CNC milling machine"]')!.click();
     element.querySelector<HTMLButtonElement>('[aria-label="Delete Industrial lathe"]')!.click();
 
     expect(edited).toEqual([CERTIFICATES[0]]);
     expect(deleted).toEqual([CERTIFICATES[1]]);
+    expect(element.textContent).toContain('1 selected');
   });
 
   it('shows an accessible empty state when filters have no matches', () => {
