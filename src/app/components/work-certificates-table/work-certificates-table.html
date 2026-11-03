@@ -1,0 +1,171 @@
+<section class="table-card" aria-labelledby="work-certificates-title">
+  <header class="table-header">
+    <div>
+      <p class="eyebrow">Work records</p>
+      <h1 id="work-certificates-title">Certificates of work performed</h1>
+      <p class="summary" aria-live="polite">
+        {{ filteredCertificates().length }} of {{ certificates().length }} records
+        <span aria-hidden="true">·</span>
+        {{ selectedCount() }} selected
+      </p>
+    </div>
+  </header>
+
+  <form class="filters" [formGroup]="filters" aria-label="Table filters">
+    <label class="filter-field">
+      <span>Date</span>
+      <tui-textfield tuiTextfieldSize="s">
+        <input aria-label="Filter by date" formControlName="date" tuiInput type="date" />
+      </tui-textfield>
+    </label>
+
+    <label class="filter-field">
+      <span>Machine</span>
+      <tui-textfield tuiTextfieldSize="s">
+        <input
+          aria-label="Filter by machine name"
+          formControlName="machineName"
+          placeholder="All machines"
+          tuiInput
+        />
+      </tui-textfield>
+    </label>
+
+    <label class="filter-field">
+      <span>Inventory number</span>
+      <tui-textfield tuiTextfieldSize="s">
+        <input
+          aria-label="Filter by inventory number"
+          formControlName="inventoryNumber"
+          placeholder="All numbers"
+          tuiInput
+        />
+      </tui-textfield>
+    </label>
+
+    <label class="filter-field">
+      <span>Employees</span>
+      <tui-textfield tuiTextfieldSize="s">
+        <input
+          aria-label="Filter by employee"
+          formControlName="employees"
+          placeholder="All employees"
+          tuiInput
+        />
+      </tui-textfield>
+    </label>
+
+    <label class="filter-field">
+      <span>Selection</span>
+      <select aria-label="Filter by selection" formControlName="selection">
+        <option value="all">All rows</option>
+        <option value="selected">Selected</option>
+        <option value="unselected">Not selected</option>
+      </select>
+    </label>
+
+    <button
+      appearance="secondary"
+      size="s"
+      tuiButton
+      type="button"
+      [disabled]="!hasActiveFilters()"
+      (click)="clearFilters()"
+    >
+      Clear filters
+    </button>
+  </form>
+
+  <div
+    class="table-scroll"
+    tabindex="0"
+    aria-label="Certificates table. Scroll horizontally if needed."
+  >
+    <table size="m" tuiTable>
+      <caption class="visually-hidden">
+        Certificates of work performed with sortable columns and row actions
+      </caption>
+      <thead>
+        <tr>
+          <th tuiTh scope="col" class="selection-column" [sorter]="null">
+            <input
+              class="selection-checkbox"
+              aria-label="Select all visible certificates"
+              type="checkbox"
+              [checked]="allVisibleSelected()"
+              [indeterminate]="someVisibleSelected()"
+              (change)="toggleAllVisible($event)"
+            />
+          </th>
+          <th tuiTh scope="col" [sorter]="dateSorter">Date</th>
+          <th tuiTh scope="col" [sorter]="machineSorter">Machine name</th>
+          <th tuiTh scope="col" [sorter]="inventorySorter">Inventory number</th>
+          <th tuiTh scope="col" [sorter]="employeesSorter">Employees</th>
+          <th tuiTh scope="col" class="actions-column" [sorter]="null">Actions</th>
+        </tr>
+      </thead>
+
+      @let sortedCertificates = filteredCertificates() | tuiTableSort;
+      @if (sortedCertificates.length) {
+        <tbody tuiTbody [data]="sortedCertificates">
+          @for (certificate of sortedCertificates; track certificate.id) {
+            <tr>
+              <td tuiTd class="selection-column">
+                <input
+                  class="selection-checkbox"
+                  type="checkbox"
+                  [attr.aria-label]="'Select ' + certificate.machineName"
+                  [checked]="isSelected(certificate.id)"
+                  (change)="toggleRow(certificate.id, $event)"
+                />
+              </td>
+              <td tuiTd class="date-cell">{{ certificate.date | dateOnly }}</td>
+              <td tuiTd class="machine-cell">{{ certificate.machineName }}</td>
+              <td tuiTd>
+                <span class="inventory-number">{{ certificate.inventoryNumber }}</span>
+              </td>
+              <td tuiTd>{{ certificate.employees.join(', ') }}</td>
+              <td tuiTd class="actions-column">
+                <div class="row-actions">
+                  <button
+                    appearance="action"
+                    iconStart="@tui.pencil"
+                    size="xs"
+                    tuiIconButton
+                    type="button"
+                    [attr.aria-label]="'Edit ' + certificate.machineName"
+                    [attr.title]="'Edit ' + certificate.machineName"
+                    (click)="requestEdit(certificate)"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    appearance="action"
+                    iconStart="@tui.trash"
+                    size="xs"
+                    tuiIconButton
+                    type="button"
+                    [attr.aria-label]="'Delete ' + certificate.machineName"
+                    [attr.title]="'Delete ' + certificate.machineName"
+                    (click)="requestDelete(certificate)"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      } @else {
+        <tbody>
+          <tr>
+            <td tuiTd colspan="6" class="empty-state">
+              <strong>No certificates found</strong>
+              <span>Change or clear the filters to see more records.</span>
+            </td>
+          </tr>
+        </tbody>
+      }
+    </table>
+  </div>
+</section>

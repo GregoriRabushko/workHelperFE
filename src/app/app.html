@@ -1,1 +1,15 @@
-<tui-root> </tui-root>
+<tui-root>
+  <main class="workspace">
+    <app-work-certificates-table
+      [certificates]="certificates()"
+      (deleteRequested)="handleDelete($event)"
+      (editRequested)="handleEdit($event)"
+    />
+
+    <p class="action-status" role="status" aria-live="polite">
+      @if (editTarget(); as certificate) {
+        Ready to edit {{ certificate.machineName }} ({{ certificate.inventoryNumber }}).
+      }
+    </p>
+  </main>
+</tui-root>
