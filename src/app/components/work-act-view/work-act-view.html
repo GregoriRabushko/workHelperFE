@@ -149,7 +149,6 @@
                 <th scope="col">Ед. изм.</th>
                 <th scope="col">Кол-во</th>
                 <th scope="col">Гарантия</th>
-                <th scope="col">Заказчик</th>
               </tr>
             </thead>
             <tbody>
@@ -163,7 +162,6 @@
                   <td>{{ material.unit }}</td>
                   <td>{{ material.quantity }}</td>
                   <td>{{ material.paymentSource === 'warranty' ? 'Да' : '—' }}</td>
-                  <td>{{ material.paymentSource === 'customer' ? 'Да' : '—' }}</td>
                 </tr>
               }
             </tbody>
@@ -216,10 +214,6 @@
         <div>
           <span class="meta-label" id="performers-title">Исполнители</span>
           <strong>{{ act().performers.join(', ') }}</strong>
-        </div>
-        <div>
-          <span class="meta-label">Представитель заказчика</span>
-          <strong>{{ act().postRepair.receivedBy }}</strong>
         </div>
       </section>
     </article>

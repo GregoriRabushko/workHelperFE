@@ -105,7 +105,6 @@ describe('WorkActView', () => {
       'Ед. изм.',
       'Кол-во',
       'Гарантия',
-      'Заказчик',
     ]);
     expect(element.querySelector('.materials-table tfoot')).toBeNull();
     expect(element.textContent).not.toContain('Цена с НДС');
@@ -140,6 +139,12 @@ describe('WorkActView', () => {
     );
     expect(requiredTable.textContent).not.toContain('Защитный кожух');
     expect(requiredTable.textContent).not.toContain('10 рабочих дней');
+
+    const signatures = element.querySelector<HTMLElement>('.signatures')!;
+
+    expect(signatures.textContent).toContain('Исполнители');
+    expect(signatures.textContent).not.toContain('Представитель заказчика');
+    expect(signatures.textContent).not.toContain('Сергей Волков');
   });
 
   it('emits a back request', () => {
