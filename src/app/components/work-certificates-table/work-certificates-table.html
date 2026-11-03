@@ -129,6 +129,18 @@
                 <div class="row-actions">
                   <button
                     appearance="action"
+                    iconStart="@tui.eye"
+                    size="xs"
+                    tuiIconButton
+                    type="button"
+                    [attr.aria-label]="'View ' + certificate.machineName"
+                    [attr.title]="'View ' + certificate.machineName"
+                    (click)="requestView(certificate)"
+                  >
+                    View
+                  </button>
+                  <button
+                    appearance="action"
                     iconStart="@tui.pencil"
                     size="xs"
                     tuiIconButton

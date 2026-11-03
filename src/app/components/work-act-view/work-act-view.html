@@ -1,0 +1,278 @@
+<section class="act-view" aria-labelledby="act-title">
+  <header class="act-header">
+    <button
+      appearance="secondary"
+      iconStart="@tui.arrow-left"
+      size="s"
+      tuiButton
+      type="button"
+      (click)="backRequested.emit()"
+    >
+      All acts
+    </button>
+
+    <div class="act-heading">
+      <p class="eyebrow">Workshop record</p>
+      <h1 id="act-title">Work completion act {{ act().number }}</h1>
+      <p class="subtitle">{{ act().equipment.name }} · {{ act().date | workActDate: 'long' }}</p>
+    </div>
+
+    <span class="document-status">Completed</span>
+  </header>
+
+  <tui-tabs
+    aria-label="Act pages"
+    role="tablist"
+    size="m"
+    [activeItemIndex]="activeTab()"
+    (activeItemIndexChange)="selectTab($event)"
+  >
+    <button
+      id="act-front-tab"
+      role="tab"
+      tuiTab
+      type="button"
+      aria-controls="act-front-panel"
+      [attr.aria-selected]="activeTab() === 0"
+      (click)="selectTab(0)"
+    >
+      Act details
+    </button>
+    <button
+      id="act-back-tab"
+      role="tab"
+      tuiTab
+      type="button"
+      aria-controls="act-back-panel"
+      [attr.aria-selected]="activeTab() === 1"
+      (click)="selectTab(1)"
+    >
+      Materials & completion
+    </button>
+  </tui-tabs>
+
+  @if (activeTab() === 0) {
+    <article id="act-front-panel" class="act-sheet" role="tabpanel" aria-labelledby="act-front-tab">
+      <div class="document-meta">
+        <div>
+          <p class="meta-label">Service provider</p>
+          <strong>{{ act().company.name }}</strong>
+          <span>{{ act().company.address }}</span>
+          <span>{{ act().company.phone }}</span>
+        </div>
+        <dl>
+          <div>
+            <dt>Act number</dt>
+            <dd>{{ act().number }}</dd>
+          </div>
+          <div>
+            <dt>Act date</dt>
+            <dd>{{ act().date | workActDate: 'medium' }}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <section class="act-section" aria-labelledby="equipment-title">
+        <div class="section-heading">
+          <span>01</span>
+          <h2 id="equipment-title">Equipment and repair request</h2>
+        </div>
+        <div class="table-scroll" tabindex="0">
+          <table class="data-table equipment-table">
+            <caption>
+              Equipment accepted for repair
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">Inventory no.</th>
+                <th scope="col">Equipment and model</th>
+                <th scope="col">Repair reason</th>
+                <th scope="col">Meter reading</th>
+                <th scope="col">Brigade</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <span class="code">{{ act().equipment.inventoryNumber }}</span>
+                </td>
+                <td>
+                  <strong>{{ act().equipment.name }}</strong>
+                  <small>{{ act().equipment.model }}</small>
+                </td>
+                <td>{{ act().equipment.repairReason }}</td>
+                <td>{{ act().equipment.meterReading }}</td>
+                <td>{{ act().equipment.brigade.join(', ') }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="act-section" aria-labelledby="works-title">
+        <div class="section-heading">
+          <span>02</span>
+          <h2 id="works-title">Completed work</h2>
+        </div>
+        <div class="table-scroll" tabindex="0">
+          <table class="data-table works-table">
+            <caption>
+              List of completed repair work
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Work description</th>
+                <th scope="col">Labor hours</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (work of act().completedWorks; track work.id) {
+                <tr>
+                  <td>{{ work.id }}</td>
+                  <td>{{ work.name }}</td>
+                  <td>{{ work.laborHours | number: '1.1-1' }}</td>
+                </tr>
+              }
+            </tbody>
+            <tfoot>
+              <tr>
+                <th scope="row" colspan="2">Total</th>
+                <td>{{ totalWorkHours() | number: '1.1-1' }} h</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </section>
+    </article>
+  } @else {
+    <article id="act-back-panel" class="act-sheet" role="tabpanel" aria-labelledby="act-back-tab">
+      <section class="act-section" aria-labelledby="materials-title">
+        <div class="section-heading">
+          <span>03</span>
+          <h2 id="materials-title">Spare parts and materials</h2>
+        </div>
+        <div class="table-scroll" tabindex="0">
+          <table class="data-table materials-table">
+            <caption>
+              Spare parts and materials used during repair
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Item code</th>
+                <th scope="col">Unit</th>
+                <th scope="col">Qty</th>
+                <th scope="col">Price incl. VAT</th>
+                <th scope="col">Amount incl. VAT</th>
+                <th scope="col">Warranty</th>
+                <th scope="col">Customer</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (material of act().materials; track material.id) {
+                <tr>
+                  <td>{{ material.id }}</td>
+                  <td>{{ material.name }}</td>
+                  <td>
+                    <span class="code">{{ material.itemCode }}</span>
+                  </td>
+                  <td>{{ material.unit }}</td>
+                  <td>{{ material.quantity }}</td>
+                  <td>{{ material.unitPrice | number: '1.2-2' }} BYN</td>
+                  <td>{{ material.quantity * material.unitPrice | number: '1.2-2' }} BYN</td>
+                  <td>{{ material.paymentSource === 'warranty' ? 'Yes' : '—' }}</td>
+                  <td>{{ material.paymentSource === 'customer' ? 'Yes' : '—' }}</td>
+                </tr>
+              }
+            </tbody>
+            <tfoot>
+              <tr>
+                <th scope="row" colspan="6">Total</th>
+                <td>{{ totalMaterials() | number: '1.2-2' }} BYN</td>
+                <td colspan="2"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </section>
+
+      <section class="act-section" aria-labelledby="post-repair-title">
+        <div class="section-heading">
+          <span>04</span>
+          <h2 id="post-repair-title">Post-repair information</h2>
+        </div>
+        <div class="post-repair-grid">
+          <div>
+            <span class="meta-label">Equipment condition</span>
+            <strong class="condition" [class.condition--negative]="!act().postRepair.operational">
+              {{ act().postRepair.operational ? 'Operational' : 'Not operational' }}
+            </strong>
+          </div>
+          <div>
+            <span class="meta-label">Acceptance</span>
+            <strong>{{ act().postRepair.acceptance }}</strong>
+          </div>
+          <div class="notes">
+            <span class="meta-label">Notes</span>
+            <p>{{ act().postRepair.notes }}</p>
+          </div>
+          <div>
+            <span class="meta-label">Senior master</span>
+            <strong>{{ act().postRepair.seniorMaster }}</strong>
+          </div>
+          <div>
+            <span class="meta-label">Accepted by</span>
+            <strong>{{ act().postRepair.receivedBy }}</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="act-section" aria-labelledby="required-works-title">
+        <div class="section-heading">
+          <span>05</span>
+          <h2 id="required-works-title">Required follow-up work</h2>
+        </div>
+        <div class="table-scroll" tabindex="0">
+          <table class="data-table required-table">
+            <caption>
+              Parts and work recommended after this repair
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Qty</th>
+                <th scope="col">Delivery time</th>
+                <th scope="col">Required work</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (work of act().requiredWorks; track work.id) {
+                <tr>
+                  <td>{{ work.id }}</td>
+                  <td>{{ work.name }}</td>
+                  <td>{{ work.quantity }}</td>
+                  <td>{{ work.deliveryTime }}</td>
+                  <td>{{ work.workType }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="signatures" aria-labelledby="performers-title">
+        <div>
+          <span class="meta-label" id="performers-title">Performers</span>
+          <strong>{{ act().performers.join(', ') }}</strong>
+        </div>
+        <div>
+          <span class="meta-label">Customer representative</span>
+          <strong>{{ act().postRepair.receivedBy }}</strong>
+        </div>
+      </section>
+    </article>
+  }
+</section>

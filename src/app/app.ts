@@ -11,7 +11,10 @@ import {
 import { TuiButton, TuiDialog, TuiDialogService, TuiInput, TuiRoot } from '@taiga-ui/core';
 import { TUI_CONFIRM } from '@taiga-ui/kit';
 
+import { WorkActView } from './components/work-act-view/work-act-view';
 import { WorkCertificatesTable } from './components/work-certificates-table/work-certificates-table';
+import { createWorkAct } from './data/work-act-factory';
+import { type WorkAct } from './models/work-act';
 import { type WorkCertificate } from './models/work-certificate';
 
 const INITIAL_CERTIFICATES: readonly WorkCertificate[] = [
@@ -63,7 +66,15 @@ const hasEmployee: ValidatorFn = (control: AbstractControl): ValidationErrors | 
 
 @Component({
   selector: 'app-root',
-  imports: [ReactiveFormsModule, TuiButton, TuiDialog, TuiInput, TuiRoot, WorkCertificatesTable],
+  imports: [
+    ReactiveFormsModule,
+    TuiButton,
+    TuiDialog,
+    TuiInput,
+    TuiRoot,
+    WorkActView,
+    WorkCertificatesTable,
+  ],
   templateUrl: './app.html',
   styleUrl: './app.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -72,6 +83,7 @@ export class App {
   private readonly dialogs = inject(TuiDialogService);
 
   protected readonly certificates = signal(INITIAL_CERTIFICATES);
+  protected readonly selectedAct = signal<WorkAct | null>(null);
   protected readonly editTarget = signal<WorkCertificate | null>(null);
   protected readonly editDialogOpen = signal(false);
   protected readonly editDialogOptions = {
@@ -94,6 +106,14 @@ export class App {
       employees: certificate.employees.join(', '),
     });
     this.editDialogOpen.set(true);
+  }
+
+  protected handleView(certificate: WorkCertificate): void {
+    this.selectedAct.set(createWorkAct(certificate));
+  }
+
+  protected closeAct(): void {
+    this.selectedAct.set(null);
   }
 
   protected handleDelete(certificate: WorkCertificate): void {

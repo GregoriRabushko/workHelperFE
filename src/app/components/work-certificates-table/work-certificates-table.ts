@@ -59,6 +59,7 @@ class DateOnlyPipe implements PipeTransform {
 })
 export class WorkCertificatesTable {
   readonly certificates = input<readonly WorkCertificate[]>([]);
+  readonly viewRequested = output<WorkCertificate>();
   readonly editRequested = output<WorkCertificate>();
   readonly deleteRequested = output<WorkCertificate>();
 
@@ -196,6 +197,10 @@ export class WorkCertificatesTable {
 
   protected requestEdit(certificate: WorkCertificate): void {
     this.editRequested.emit(certificate);
+  }
+
+  protected requestView(certificate: WorkCertificate): void {
+    this.viewRequested.emit(certificate);
   }
 
   protected requestDelete(certificate: WorkCertificate): void {

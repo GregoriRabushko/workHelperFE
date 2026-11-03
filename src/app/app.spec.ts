@@ -58,6 +58,32 @@ describe('App', () => {
     expect(compiled.querySelector('h1')?.textContent).toContain('Certificates of work performed');
   });
 
+  it('opens an act with two pages and returns to the table', async () => {
+    const fixture = await renderApp();
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    compiled.querySelector<HTMLButtonElement>('[aria-label="View Hydraulic press"]')!.click();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(compiled.querySelectorAll('button[tuiTab]')).toHaveLength(2);
+    expect(compiled.textContent).toContain('Work completion act WR-2026-0002');
+    expect(compiled.textContent).toContain('Equipment and repair request');
+
+    compiled.querySelector<HTMLButtonElement>('#act-back-tab')!.click();
+    fixture.detectChanges();
+    expect(compiled.textContent).toContain('Spare parts and materials');
+
+    const back = Array.from(compiled.querySelectorAll<HTMLButtonElement>('button')).find(
+      (button) => button.textContent?.trim() === 'All acts',
+    );
+    back!.click();
+    fixture.detectChanges();
+
+    expect(compiled.textContent).toContain('Certificates of work performed');
+  });
+
   it('edits a certificate in the dialog', async () => {
     const fixture = await renderApp();
     const compiled = fixture.nativeElement as HTMLElement;

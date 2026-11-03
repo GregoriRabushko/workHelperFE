@@ -1,10 +1,15 @@
 <tui-root>
   <main class="workspace">
-    <app-work-certificates-table
-      [certificates]="certificates()"
-      (deleteRequested)="handleDelete($event)"
-      (editRequested)="handleEdit($event)"
-    />
+    @if (selectedAct(); as act) {
+      <app-work-act-view [act]="act" (backRequested)="closeAct()" />
+    } @else {
+      <app-work-certificates-table
+        [certificates]="certificates()"
+        (deleteRequested)="handleDelete($event)"
+        (editRequested)="handleEdit($event)"
+        (viewRequested)="handleView($event)"
+      />
+    }
   </main>
 
   <ng-template

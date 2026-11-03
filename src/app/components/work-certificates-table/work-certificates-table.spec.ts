@@ -145,9 +145,11 @@ describe('WorkCertificatesTable', () => {
     expect(element.textContent).toContain('0 selected');
   });
 
-  it('emits the corresponding certificate for edit and delete actions', () => {
+  it('emits the corresponding certificate for view, edit, and delete actions', () => {
+    const viewed: WorkCertificate[] = [];
     const edited: WorkCertificate[] = [];
     const deleted: WorkCertificate[] = [];
+    fixture.componentInstance.viewRequested.subscribe((certificate) => viewed.push(certificate));
     fixture.componentInstance.editRequested.subscribe((certificate) => edited.push(certificate));
     fixture.componentInstance.deleteRequested.subscribe((certificate) => deleted.push(certificate));
 
@@ -158,9 +160,11 @@ describe('WorkCertificatesTable', () => {
     rowCheckbox!.dispatchEvent(new Event('change', { bubbles: true }));
     fixture.detectChanges();
 
+    element.querySelector<HTMLButtonElement>('[aria-label="View CNC milling machine"]')!.click();
     element.querySelector<HTMLButtonElement>('[aria-label="Edit CNC milling machine"]')!.click();
     element.querySelector<HTMLButtonElement>('[aria-label="Delete Industrial lathe"]')!.click();
 
+    expect(viewed).toEqual([CERTIFICATES[0]]);
     expect(edited).toEqual([CERTIFICATES[0]]);
     expect(deleted).toEqual([CERTIFICATES[1]]);
     expect(element.textContent).toContain('1 selected');
