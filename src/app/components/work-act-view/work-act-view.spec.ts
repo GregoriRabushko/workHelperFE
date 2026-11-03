@@ -51,16 +51,16 @@ describe('WorkActView', () => {
 
     expect(tabs).toHaveLength(2);
     expect(tabs.map((tab) => tab.textContent?.trim())).toEqual([
-      'Act details',
-      'Materials & completion',
+      'Начало акта',
+      'Материалы и завершение',
     ]);
     expect(tabs[0]?.getAttribute('aria-selected')).toBe('true');
     expect(tabs[1]?.getAttribute('aria-selected')).toBe('false');
     expect(element.querySelector('#act-front-panel')).not.toBeNull();
-    expect(element.textContent).toContain('November 3, 2026');
-    expect(element.textContent).toContain('Equipment and repair request');
-    expect(element.textContent).toContain('Completed work');
-    expect(element.textContent).toContain('5.5 h');
+    expect(element.textContent).toContain('3 ноября 2026');
+    expect(element.textContent).toContain('Техника и заявка на ремонт');
+    expect(element.textContent).toContain('Выполненные работы');
+    expect(element.textContent).toContain('5,5 м/ч');
   });
 
   it('shows materials and post-repair information on the second tab', async () => {
@@ -72,10 +72,10 @@ describe('WorkActView', () => {
     fixture.detectChanges();
 
     expect(element.querySelector('#act-back-panel')).not.toBeNull();
-    expect(element.textContent).toContain('Spare parts and materials');
-    expect(element.textContent).toContain('177.00 BYN');
-    expect(element.textContent).toContain('Post-repair information');
-    expect(element.textContent).toContain('Required follow-up work');
+    expect(element.textContent).toContain('Запасные части и использованные материалы');
+    expect(element.textContent).toContain('177,00 BYN');
+    expect(element.textContent).toContain('Информация после ремонта');
+    expect(element.textContent).toContain('Необходимые виды работ');
   });
 
   it('emits a back request', () => {

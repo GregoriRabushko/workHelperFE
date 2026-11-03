@@ -160,7 +160,9 @@ describe('WorkCertificatesTable', () => {
     rowCheckbox!.dispatchEvent(new Event('change', { bubbles: true }));
     fixture.detectChanges();
 
-    element.querySelector<HTMLButtonElement>('[aria-label="View CNC milling machine"]')!.click();
+    element
+      .querySelector<HTMLButtonElement>('[aria-label="Просмотреть акт: CNC milling machine"]')!
+      .click();
     element.querySelector<HTMLButtonElement>('[aria-label="Edit CNC milling machine"]')!.click();
     element.querySelector<HTMLButtonElement>('[aria-label="Delete Industrial lathe"]')!.click();
 

@@ -8,20 +8,20 @@
       type="button"
       (click)="backRequested.emit()"
     >
-      All acts
+      Все акты
     </button>
 
     <div class="act-heading">
-      <p class="eyebrow">Workshop record</p>
-      <h1 id="act-title">Work completion act {{ act().number }}</h1>
+      <p class="eyebrow">Акт мастерской</p>
+      <h1 id="act-title">Акт выполненных работ {{ act().number }}</h1>
       <p class="subtitle">{{ act().equipment.name }} · {{ act().date | workActDate: 'long' }}</p>
     </div>
 
-    <span class="document-status">Completed</span>
+    <span class="document-status">Выполнен</span>
   </header>
 
   <tui-tabs
-    aria-label="Act pages"
+    aria-label="Страницы акта"
     role="tablist"
     size="m"
     [activeItemIndex]="activeTab()"
@@ -36,7 +36,7 @@
       [attr.aria-selected]="activeTab() === 0"
       (click)="selectTab(0)"
     >
-      Act details
+      Начало акта
     </button>
     <button
       id="act-back-tab"
@@ -47,7 +47,7 @@
       [attr.aria-selected]="activeTab() === 1"
       (click)="selectTab(1)"
     >
-      Materials & completion
+      Материалы и завершение
     </button>
   </tui-tabs>
 
@@ -55,18 +55,18 @@
     <article id="act-front-panel" class="act-sheet" role="tabpanel" aria-labelledby="act-front-tab">
       <div class="document-meta">
         <div>
-          <p class="meta-label">Service provider</p>
+          <p class="meta-label">Исполнитель</p>
           <strong>{{ act().company.name }}</strong>
           <span>{{ act().company.address }}</span>
           <span>{{ act().company.phone }}</span>
         </div>
         <dl>
           <div>
-            <dt>Act number</dt>
+            <dt>Номер акта</dt>
             <dd>{{ act().number }}</dd>
           </div>
           <div>
-            <dt>Act date</dt>
+            <dt>Дата акта</dt>
             <dd>{{ act().date | workActDate: 'medium' }}</dd>
           </div>
         </dl>
@@ -75,20 +75,20 @@
       <section class="act-section" aria-labelledby="equipment-title">
         <div class="section-heading">
           <span>01</span>
-          <h2 id="equipment-title">Equipment and repair request</h2>
+          <h2 id="equipment-title">Техника и заявка на ремонт</h2>
         </div>
         <div class="table-scroll" tabindex="0">
           <table class="data-table equipment-table">
             <caption>
-              Equipment accepted for repair
+              Техника, принятая в ремонт
             </caption>
             <thead>
               <tr>
-                <th scope="col">Inventory no.</th>
-                <th scope="col">Equipment and model</th>
-                <th scope="col">Repair reason</th>
-                <th scope="col">Meter reading</th>
-                <th scope="col">Brigade</th>
+                <th scope="col">Инв. №</th>
+                <th scope="col">Наименование техники, модель</th>
+                <th scope="col">Причина ремонта</th>
+                <th scope="col">Показания счётчика моточасов</th>
+                <th scope="col">Бригада</th>
               </tr>
             </thead>
             <tbody>
@@ -112,18 +112,18 @@
       <section class="act-section" aria-labelledby="works-title">
         <div class="section-heading">
           <span>02</span>
-          <h2 id="works-title">Completed work</h2>
+          <h2 id="works-title">Выполненные работы</h2>
         </div>
         <div class="table-scroll" tabindex="0">
           <table class="data-table works-table">
             <caption>
-              List of completed repair work
+              Список выполненных ремонтных работ
             </caption>
             <thead>
               <tr>
                 <th scope="col">#</th>
-                <th scope="col">Work description</th>
-                <th scope="col">Labor hours</th>
+                <th scope="col">Наименование работ</th>
+                <th scope="col">Моточасы</th>
               </tr>
             </thead>
             <tbody>
@@ -131,14 +131,14 @@
                 <tr>
                   <td>{{ work.id }}</td>
                   <td>{{ work.name }}</td>
-                  <td>{{ work.laborHours | number: '1.1-1' }}</td>
+                  <td>{{ work.laborHours | workActNumber: 'hours' }}</td>
                 </tr>
               }
             </tbody>
             <tfoot>
               <tr>
-                <th scope="row" colspan="2">Total</th>
-                <td>{{ totalWorkHours() | number: '1.1-1' }} h</td>
+                <th scope="row" colspan="2">Итого</th>
+                <td>{{ totalWorkHours() | workActNumber: 'hours' }} м/ч</td>
               </tr>
             </tfoot>
           </table>
@@ -150,24 +150,24 @@
       <section class="act-section" aria-labelledby="materials-title">
         <div class="section-heading">
           <span>03</span>
-          <h2 id="materials-title">Spare parts and materials</h2>
+          <h2 id="materials-title">Запасные части и использованные материалы</h2>
         </div>
         <div class="table-scroll" tabindex="0">
           <table class="data-table materials-table">
             <caption>
-              Spare parts and materials used during repair
+              Запасные части и материалы, использованные при ремонте
             </caption>
             <thead>
               <tr>
                 <th scope="col">#</th>
-                <th scope="col">Name</th>
-                <th scope="col">Item code</th>
-                <th scope="col">Unit</th>
-                <th scope="col">Qty</th>
-                <th scope="col">Price incl. VAT</th>
-                <th scope="col">Amount incl. VAT</th>
-                <th scope="col">Warranty</th>
-                <th scope="col">Customer</th>
+                <th scope="col">Наименование</th>
+                <th scope="col">Код товара</th>
+                <th scope="col">Ед. изм.</th>
+                <th scope="col">Кол-во</th>
+                <th scope="col">Цена с НДС</th>
+                <th scope="col">Сумма с НДС</th>
+                <th scope="col">Гарантия</th>
+                <th scope="col">Заказчик</th>
               </tr>
             </thead>
             <tbody>
@@ -180,17 +180,19 @@
                   </td>
                   <td>{{ material.unit }}</td>
                   <td>{{ material.quantity }}</td>
-                  <td>{{ material.unitPrice | number: '1.2-2' }} BYN</td>
-                  <td>{{ material.quantity * material.unitPrice | number: '1.2-2' }} BYN</td>
-                  <td>{{ material.paymentSource === 'warranty' ? 'Yes' : '—' }}</td>
-                  <td>{{ material.paymentSource === 'customer' ? 'Yes' : '—' }}</td>
+                  <td>{{ material.unitPrice | workActNumber: 'currency' }} BYN</td>
+                  <td>
+                    {{ material.quantity * material.unitPrice | workActNumber: 'currency' }} BYN
+                  </td>
+                  <td>{{ material.paymentSource === 'warranty' ? 'Да' : '—' }}</td>
+                  <td>{{ material.paymentSource === 'customer' ? 'Да' : '—' }}</td>
                 </tr>
               }
             </tbody>
             <tfoot>
               <tr>
-                <th scope="row" colspan="6">Total</th>
-                <td>{{ totalMaterials() | number: '1.2-2' }} BYN</td>
+                <th scope="row" colspan="6">Итого</th>
+                <td>{{ totalMaterials() | workActNumber: 'currency' }} BYN</td>
                 <td colspan="2"></td>
               </tr>
             </tfoot>
@@ -201,29 +203,29 @@
       <section class="act-section" aria-labelledby="post-repair-title">
         <div class="section-heading">
           <span>04</span>
-          <h2 id="post-repair-title">Post-repair information</h2>
+          <h2 id="post-repair-title">Информация после ремонта</h2>
         </div>
         <div class="post-repair-grid">
           <div>
-            <span class="meta-label">Equipment condition</span>
+            <span class="meta-label">Состояние техники</span>
             <strong class="condition" [class.condition--negative]="!act().postRepair.operational">
-              {{ act().postRepair.operational ? 'Operational' : 'Not operational' }}
+              {{ act().postRepair.operational ? 'Рабочее' : 'Нерабочее' }}
             </strong>
           </div>
           <div>
-            <span class="meta-label">Acceptance</span>
+            <span class="meta-label">Приёмка</span>
             <strong>{{ act().postRepair.acceptance }}</strong>
           </div>
           <div class="notes">
-            <span class="meta-label">Notes</span>
+            <span class="meta-label">Замечания</span>
             <p>{{ act().postRepair.notes }}</p>
           </div>
           <div>
-            <span class="meta-label">Senior master</span>
+            <span class="meta-label">Старший мастер</span>
             <strong>{{ act().postRepair.seniorMaster }}</strong>
           </div>
           <div>
-            <span class="meta-label">Accepted by</span>
+            <span class="meta-label">Принял после ремонта</span>
             <strong>{{ act().postRepair.receivedBy }}</strong>
           </div>
         </div>
@@ -232,20 +234,20 @@
       <section class="act-section" aria-labelledby="required-works-title">
         <div class="section-heading">
           <span>05</span>
-          <h2 id="required-works-title">Required follow-up work</h2>
+          <h2 id="required-works-title">Необходимые виды работ</h2>
         </div>
         <div class="table-scroll" tabindex="0">
           <table class="data-table required-table">
             <caption>
-              Parts and work recommended after this repair
+              Запчасти и работы, рекомендованные после ремонта
             </caption>
             <thead>
               <tr>
                 <th scope="col">#</th>
-                <th scope="col">Name</th>
-                <th scope="col">Qty</th>
-                <th scope="col">Delivery time</th>
-                <th scope="col">Required work</th>
+                <th scope="col">Наименование</th>
+                <th scope="col">Кол-во</th>
+                <th scope="col">Срок поставки</th>
+                <th scope="col">Необходимые виды работ</th>
               </tr>
             </thead>
             <tbody>
@@ -265,11 +267,11 @@
 
       <section class="signatures" aria-labelledby="performers-title">
         <div>
-          <span class="meta-label" id="performers-title">Performers</span>
+          <span class="meta-label" id="performers-title">Исполнители</span>
           <strong>{{ act().performers.join(', ') }}</strong>
         </div>
         <div>
-          <span class="meta-label">Customer representative</span>
+          <span class="meta-label">Представитель заказчика</span>
           <strong>{{ act().postRepair.receivedBy }}</strong>
         </div>
       </section>

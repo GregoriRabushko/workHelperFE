@@ -1,4 +1,3 @@
-import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -15,13 +14,24 @@ import { TuiTabs } from '@taiga-ui/kit';
 import { type WorkAct } from '../../models/work-act';
 
 const ACT_DATE_FORMATTERS = {
-  long: new Intl.DateTimeFormat('en-US', {
+  long: new Intl.DateTimeFormat('ru-RU', {
     dateStyle: 'long',
     timeZone: 'UTC',
   }),
-  medium: new Intl.DateTimeFormat('en-US', {
+  medium: new Intl.DateTimeFormat('ru-RU', {
     dateStyle: 'medium',
     timeZone: 'UTC',
+  }),
+};
+
+const ACT_NUMBER_FORMATTERS = {
+  currency: new Intl.NumberFormat('ru-RU', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }),
+  hours: new Intl.NumberFormat('ru-RU', {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
   }),
 };
 
@@ -34,9 +44,16 @@ class WorkActDatePipe implements PipeTransform {
   }
 }
 
+@Pipe({ name: 'workActNumber' })
+class WorkActNumberPipe implements PipeTransform {
+  transform(value: number, style: keyof typeof ACT_NUMBER_FORMATTERS): string {
+    return ACT_NUMBER_FORMATTERS[style].format(value);
+  }
+}
+
 @Component({
   selector: 'app-work-act-view',
-  imports: [DecimalPipe, TuiButton, TuiTabs, WorkActDatePipe],
+  imports: [TuiButton, TuiTabs, WorkActDatePipe, WorkActNumberPipe],
   templateUrl: './work-act-view.html',
   styleUrl: './work-act-view.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

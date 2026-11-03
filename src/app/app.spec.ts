@@ -62,21 +62,23 @@ describe('App', () => {
     const fixture = await renderApp();
     const compiled = fixture.nativeElement as HTMLElement;
 
-    compiled.querySelector<HTMLButtonElement>('[aria-label="View Hydraulic press"]')!.click();
+    compiled
+      .querySelector<HTMLButtonElement>('[aria-label="Просмотреть акт: Hydraulic press"]')!
+      .click();
     fixture.detectChanges();
     await fixture.whenStable();
     fixture.detectChanges();
 
     expect(compiled.querySelectorAll('button[tuiTab]')).toHaveLength(2);
-    expect(compiled.textContent).toContain('Work completion act WR-2026-0002');
-    expect(compiled.textContent).toContain('Equipment and repair request');
+    expect(compiled.textContent).toContain('Акт выполненных работ WR-2026-0002');
+    expect(compiled.textContent).toContain('Техника и заявка на ремонт');
 
     compiled.querySelector<HTMLButtonElement>('#act-back-tab')!.click();
     fixture.detectChanges();
-    expect(compiled.textContent).toContain('Spare parts and materials');
+    expect(compiled.textContent).toContain('Запасные части и использованные материалы');
 
     const back = Array.from(compiled.querySelectorAll<HTMLButtonElement>('button')).find(
-      (button) => button.textContent?.trim() === 'All acts',
+      (button) => button.textContent?.trim() === 'Все акты',
     );
     back!.click();
     fixture.detectChanges();
