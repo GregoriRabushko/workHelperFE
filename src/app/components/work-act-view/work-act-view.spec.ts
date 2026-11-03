@@ -57,13 +57,27 @@ describe('WorkActView', () => {
     expect(tabs[0]?.getAttribute('aria-selected')).toBe('true');
     expect(tabs[1]?.getAttribute('aria-selected')).toBe('false');
     expect(element.querySelector('#act-front-panel')).not.toBeNull();
-    expect(element.textContent).toContain('3 ноября 2026');
+    expect(element.textContent).toContain('3 нояб. 2026 г.');
     expect(element.textContent).toContain('Техника и заявка на ремонт');
     expect(element.textContent).toContain('Выполненные работы');
     expect(element.textContent).toContain('5,5 м/ч');
   });
 
-  it('shows materials and post-repair information on the second tab', async () => {
+  it('shows only the date in the act header', () => {
+    const metadata = element.querySelector<HTMLElement>('.act-header .document-meta');
+
+    expect(metadata).not.toBeNull();
+    expect(metadata!.textContent).toContain('Дата акта');
+    expect(metadata!.textContent).toContain('3 нояб. 2026 г.');
+    expect(metadata!.textContent).not.toContain('Исполнитель');
+    expect(metadata!.textContent).not.toContain('ООО «ТРОС»');
+    expect(metadata!.textContent).not.toContain('Номер акта');
+    expect(metadata!.textContent).not.toContain('WR-2026-0001');
+    expect(metadata!.textContent).not.toContain('Минский район');
+    expect(metadata!.textContent).not.toContain('+375');
+  });
+
+  it('shows only the requested material, post-repair, and follow-up fields', async () => {
     element
       .querySelector<HTMLButtonElement>('#act-back-tab')!
       .dispatchEvent(new MouseEvent('click', { bubbles: true }));
@@ -72,10 +86,60 @@ describe('WorkActView', () => {
     fixture.detectChanges();
 
     expect(element.querySelector('#act-back-panel')).not.toBeNull();
+    expect(element.querySelector('.act-header .document-meta')?.textContent).not.toContain(
+      'Исполнитель',
+    );
     expect(element.textContent).toContain('Запасные части и использованные материалы');
-    expect(element.textContent).toContain('177,00 BYN');
     expect(element.textContent).toContain('Информация после ремонта');
     expect(element.textContent).toContain('Необходимые виды работ');
+
+    const materialHeadings = Array.from(
+      element.querySelectorAll<HTMLTableCellElement>('.materials-table thead th'),
+      (heading) => heading.textContent?.trim(),
+    );
+
+    expect(materialHeadings).toEqual([
+      '#',
+      'Наименование',
+      'Код товара',
+      'Ед. изм.',
+      'Кол-во',
+      'Гарантия',
+      'Заказчик',
+    ]);
+    expect(element.querySelector('.materials-table tfoot')).toBeNull();
+    expect(element.textContent).not.toContain('Цена с НДС');
+    expect(element.textContent).not.toContain('Сумма с НДС');
+    expect(element.textContent).not.toContain('177,00 BYN');
+
+    const postRepair =
+      element.querySelector<HTMLElement>('#post-repair-title')!.parentElement!.parentElement!;
+
+    expect(postRepair.querySelectorAll('.post-repair-grid > div')).toHaveLength(1);
+    expect(postRepair.textContent).toContain('Состояние техники');
+    expect(postRepair.textContent).toContain('Рабочее');
+    expect(postRepair.textContent).not.toContain('Приёмка');
+    expect(postRepair.textContent).not.toContain('Замечания');
+    expect(postRepair.textContent).not.toContain('Старший мастер');
+    expect(postRepair.textContent).not.toContain('Принял после ремонта');
+
+    const requiredTable = element.querySelector<HTMLTableElement>('.required-table')!;
+    const requiredHeadings = Array.from(
+      requiredTable.querySelectorAll<HTMLTableCellElement>('thead th'),
+      (heading) => heading.textContent?.trim(),
+    );
+
+    expect(requiredHeadings).toEqual(['Необходимые виды работ']);
+    expect(requiredTable.querySelectorAll('tbody tr')).toHaveLength(2);
+    expect(requiredTable.querySelectorAll('tbody td')).toHaveLength(2);
+    expect(requiredTable.textContent).toContain(
+      'Заменить повреждённый кожух во время следующей плановой остановки',
+    );
+    expect(requiredTable.textContent).toContain(
+      'Обновить предупреждающие и эксплуатационные таблички',
+    );
+    expect(requiredTable.textContent).not.toContain('Защитный кожух');
+    expect(requiredTable.textContent).not.toContain('10 рабочих дней');
   });
 
   it('emits a back request', () => {

@@ -62,15 +62,18 @@ describe('App', () => {
     const fixture = await renderApp();
     const compiled = fixture.nativeElement as HTMLElement;
 
-    compiled
-      .querySelector<HTMLButtonElement>('[aria-label="Просмотреть акт: Hydraulic press"]')!
-      .click();
+    const hydraulicPressRow = Array.from(
+      compiled.querySelectorAll<HTMLTableRowElement>('tbody tr'),
+    ).find((row) => row.textContent?.includes('Hydraulic press'))!;
+
+    hydraulicPressRow.querySelector<HTMLTableCellElement>('.machine-cell')!.click();
     fixture.detectChanges();
     await fixture.whenStable();
     fixture.detectChanges();
 
     expect(compiled.querySelectorAll('button[tuiTab]')).toHaveLength(2);
-    expect(compiled.textContent).toContain('Акт выполненных работ WR-2026-0002');
+    expect(compiled.textContent).toContain('Акт выполненных работ');
+    expect(compiled.textContent).not.toContain('WR-2026-0002');
     expect(compiled.textContent).toContain('Техника и заявка на ремонт');
 
     compiled.querySelector<HTMLButtonElement>('#act-back-tab')!.click();

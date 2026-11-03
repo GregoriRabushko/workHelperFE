@@ -12,12 +12,15 @@
     </button>
 
     <div class="act-heading">
-      <p class="eyebrow">Акт мастерской</p>
-      <h1 id="act-title">Акт выполненных работ {{ act().number }}</h1>
-      <p class="subtitle">{{ act().equipment.name }} · {{ act().date | workActDate: 'long' }}</p>
+      <h1 id="act-title">Акт выполненных работ</h1>
     </div>
 
-    <span class="document-status">Выполнен</span>
+    <dl class="document-meta">
+      <div>
+        <dt>Дата акта</dt>
+        <dd>{{ act().date | workActDate: 'medium' }}</dd>
+      </div>
+    </dl>
   </header>
 
   <tui-tabs
@@ -53,25 +56,6 @@
 
   @if (activeTab() === 0) {
     <article id="act-front-panel" class="act-sheet" role="tabpanel" aria-labelledby="act-front-tab">
-      <div class="document-meta">
-        <div>
-          <p class="meta-label">Исполнитель</p>
-          <strong>{{ act().company.name }}</strong>
-          <span>{{ act().company.address }}</span>
-          <span>{{ act().company.phone }}</span>
-        </div>
-        <dl>
-          <div>
-            <dt>Номер акта</dt>
-            <dd>{{ act().number }}</dd>
-          </div>
-          <div>
-            <dt>Дата акта</dt>
-            <dd>{{ act().date | workActDate: 'medium' }}</dd>
-          </div>
-        </dl>
-      </div>
-
       <section class="act-section" aria-labelledby="equipment-title">
         <div class="section-heading">
           <span>01</span>
@@ -164,8 +148,6 @@
                 <th scope="col">Код товара</th>
                 <th scope="col">Ед. изм.</th>
                 <th scope="col">Кол-во</th>
-                <th scope="col">Цена с НДС</th>
-                <th scope="col">Сумма с НДС</th>
                 <th scope="col">Гарантия</th>
                 <th scope="col">Заказчик</th>
               </tr>
@@ -180,22 +162,11 @@
                   </td>
                   <td>{{ material.unit }}</td>
                   <td>{{ material.quantity }}</td>
-                  <td>{{ material.unitPrice | workActNumber: 'currency' }} BYN</td>
-                  <td>
-                    {{ material.quantity * material.unitPrice | workActNumber: 'currency' }} BYN
-                  </td>
                   <td>{{ material.paymentSource === 'warranty' ? 'Да' : '—' }}</td>
                   <td>{{ material.paymentSource === 'customer' ? 'Да' : '—' }}</td>
                 </tr>
               }
             </tbody>
-            <tfoot>
-              <tr>
-                <th scope="row" colspan="6">Итого</th>
-                <td>{{ totalMaterials() | workActNumber: 'currency' }} BYN</td>
-                <td colspan="2"></td>
-              </tr>
-            </tfoot>
           </table>
         </div>
       </section>
@@ -212,22 +183,6 @@
               {{ act().postRepair.operational ? 'Рабочее' : 'Нерабочее' }}
             </strong>
           </div>
-          <div>
-            <span class="meta-label">Приёмка</span>
-            <strong>{{ act().postRepair.acceptance }}</strong>
-          </div>
-          <div class="notes">
-            <span class="meta-label">Замечания</span>
-            <p>{{ act().postRepair.notes }}</p>
-          </div>
-          <div>
-            <span class="meta-label">Старший мастер</span>
-            <strong>{{ act().postRepair.seniorMaster }}</strong>
-          </div>
-          <div>
-            <span class="meta-label">Принял после ремонта</span>
-            <strong>{{ act().postRepair.receivedBy }}</strong>
-          </div>
         </div>
       </section>
 
@@ -239,24 +194,16 @@
         <div class="table-scroll" tabindex="0">
           <table class="data-table required-table">
             <caption>
-              Запчасти и работы, рекомендованные после ремонта
+              Необходимые виды работ после ремонта
             </caption>
             <thead>
               <tr>
-                <th scope="col">#</th>
-                <th scope="col">Наименование</th>
-                <th scope="col">Кол-во</th>
-                <th scope="col">Срок поставки</th>
                 <th scope="col">Необходимые виды работ</th>
               </tr>
             </thead>
             <tbody>
               @for (work of act().requiredWorks; track work.id) {
                 <tr>
-                  <td>{{ work.id }}</td>
-                  <td>{{ work.name }}</td>
-                  <td>{{ work.quantity }}</td>
-                  <td>{{ work.deliveryTime }}</td>
                   <td>{{ work.workType }}</td>
                 </tr>
               }

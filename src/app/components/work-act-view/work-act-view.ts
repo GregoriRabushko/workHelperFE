@@ -14,10 +14,6 @@ import { TuiTabs } from '@taiga-ui/kit';
 import { type WorkAct } from '../../models/work-act';
 
 const ACT_DATE_FORMATTERS = {
-  long: new Intl.DateTimeFormat('ru-RU', {
-    dateStyle: 'long',
-    timeZone: 'UTC',
-  }),
   medium: new Intl.DateTimeFormat('ru-RU', {
     dateStyle: 'medium',
     timeZone: 'UTC',
@@ -25,10 +21,6 @@ const ACT_DATE_FORMATTERS = {
 };
 
 const ACT_NUMBER_FORMATTERS = {
-  currency: new Intl.NumberFormat('ru-RU', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }),
   hours: new Intl.NumberFormat('ru-RU', {
     minimumFractionDigits: 1,
     maximumFractionDigits: 1,
@@ -65,12 +57,6 @@ export class WorkActView {
   protected readonly activeTab = signal(0);
   protected readonly totalWorkHours = computed(() =>
     this.act().completedWorks.reduce((total, work) => total + work.laborHours, 0),
-  );
-  protected readonly totalMaterials = computed(() =>
-    this.act().materials.reduce(
-      (total, material) => total + material.quantity * material.unitPrice,
-      0,
-    ),
   );
 
   protected selectTab(index: number): void {

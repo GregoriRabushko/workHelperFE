@@ -109,13 +109,14 @@
       @if (sortedCertificates.length) {
         <tbody tuiTbody [data]="sortedCertificates">
           @for (certificate of sortedCertificates; track certificate.id) {
-            <tr>
+            <tr class="certificate-row" (click)="requestView(certificate)">
               <td tuiTd class="selection-column">
                 <input
                   class="selection-checkbox"
                   type="checkbox"
                   [attr.aria-label]="'Select ' + certificate.machineName"
                   [checked]="isSelected(certificate.id)"
+                  (click)="$event.stopPropagation()"
                   (change)="toggleRow(certificate.id, $event)"
                 />
               </td>
@@ -126,7 +127,7 @@
               </td>
               <td tuiTd>{{ certificate.employees.join(', ') }}</td>
               <td tuiTd class="actions-column">
-                <div class="row-actions">
+                <div class="row-actions" (click)="$event.stopPropagation()">
                   <button
                     appearance="action"
                     iconStart="@tui.eye"

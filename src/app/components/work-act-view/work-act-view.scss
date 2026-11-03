@@ -12,7 +12,7 @@
 
 .act-header {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto 1fr;
   gap: 1.25rem;
   align-items: start;
   padding: 1.5rem;
@@ -22,17 +22,8 @@
   min-inline-size: 0;
 }
 
-.eyebrow,
-.subtitle,
 .meta-label {
   color: var(--tui-text-secondary);
-}
-
-.eyebrow {
-  margin: 0 0 0.25rem;
-  font: var(--tui-typography-ui-s);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 h1 {
@@ -40,12 +31,6 @@ h1 {
   font: var(--tui-typography-heading-4);
 }
 
-.subtitle {
-  margin: 0.5rem 0 0;
-  font: var(--tui-typography-body-m);
-}
-
-.document-status,
 .condition {
   display: inline-flex;
   align-items: center;
@@ -70,31 +55,20 @@ tui-tabs {
 
 .document-meta {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr;
+  grid-column: 1 / -1;
   gap: 2rem;
+  margin: 0;
   padding: 1.25rem;
   border-radius: 1rem;
   background: var(--tui-background-neutral-1);
 }
 
 .document-meta > div,
-.document-meta dl div,
 .post-repair-grid > div,
 .signatures > div {
   display: grid;
   gap: 0.25rem;
-}
-
-.document-meta span:not(.meta-label) {
-  color: var(--tui-text-secondary);
-  font: var(--tui-typography-body-s);
-}
-
-.document-meta dl {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(7rem, auto));
-  gap: 1.5rem;
-  margin: 0;
 }
 
 .document-meta dt,
@@ -157,11 +131,11 @@ h2 {
 }
 
 .materials-table {
-  min-inline-size: 72rem;
+  min-inline-size: 42rem;
 }
 
 .required-table {
-  min-inline-size: 52rem;
+  min-inline-size: 24rem;
 }
 
 caption {
@@ -217,7 +191,7 @@ tfoot {
 
 .post-repair-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 1rem;
 }
 
@@ -226,14 +200,6 @@ tfoot {
   padding: 1rem;
   border: 1px solid var(--tui-border-normal);
   border-radius: 0.875rem;
-}
-
-.post-repair-grid .notes {
-  grid-column: 1 / -1;
-}
-
-.notes p {
-  margin: 0;
 }
 
 .condition {
@@ -266,23 +232,11 @@ tfoot {
   .signatures {
     grid-template-columns: 1fr;
   }
-
-  .document-meta dl {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .post-repair-grid .notes {
-    grid-column: auto;
-  }
 }
 
 @media (max-width: 32rem) {
   .act-header,
   tui-tabs {
     padding-inline: 1rem;
-  }
-
-  .document-meta dl {
-    grid-template-columns: 1fr;
   }
 }
