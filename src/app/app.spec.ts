@@ -58,6 +58,37 @@ describe('App', () => {
     expect(compiled.querySelector('h1')?.textContent).toContain('Certificates of work performed');
   });
 
+  it('opens an act with two pages and returns to the table', async () => {
+    const fixture = await renderApp();
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    const hydraulicPressRow = Array.from(
+      compiled.querySelectorAll<HTMLTableRowElement>('tbody tr'),
+    ).find((row) => row.textContent?.includes('Hydraulic press'))!;
+
+    hydraulicPressRow.querySelector<HTMLTableCellElement>('.machine-cell')!.click();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(compiled.querySelectorAll('button[tuiTab]')).toHaveLength(2);
+    expect(compiled.textContent).toContain('Акт выполненных работ');
+    expect(compiled.textContent).not.toContain('WR-2026-0002');
+    expect(compiled.textContent).toContain('Техника и заявка на ремонт');
+
+    compiled.querySelector<HTMLButtonElement>('#act-back-tab')!.click();
+    fixture.detectChanges();
+    expect(compiled.textContent).toContain('Запасные части и использованные материалы');
+
+    const back = Array.from(compiled.querySelectorAll<HTMLButtonElement>('button')).find(
+      (button) => button.textContent?.trim() === 'Все акты',
+    );
+    back!.click();
+    fixture.detectChanges();
+
+    expect(compiled.textContent).toContain('Certificates of work performed');
+  });
+
   it('edits a certificate in the dialog', async () => {
     const fixture = await renderApp();
     const compiled = fixture.nativeElement as HTMLElement;

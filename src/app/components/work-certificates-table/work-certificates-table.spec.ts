@@ -145,22 +145,42 @@ describe('WorkCertificatesTable', () => {
     expect(element.textContent).toContain('0 selected');
   });
 
-  it('emits the corresponding certificate for edit and delete actions', () => {
+  it('opens a certificate from its row without opening it from nested controls', () => {
+    const viewed: WorkCertificate[] = [];
     const edited: WorkCertificate[] = [];
     const deleted: WorkCertificate[] = [];
+    fixture.componentInstance.viewRequested.subscribe((certificate) => viewed.push(certificate));
     fixture.componentInstance.editRequested.subscribe((certificate) => edited.push(certificate));
     fixture.componentInstance.deleteRequested.subscribe((certificate) => deleted.push(certificate));
+
+    const rows = Array.from(element.querySelectorAll<HTMLTableRowElement>('tbody tr'));
+    const firstRow = rows[0]!;
+    const secondRow = rows[1]!;
+
+    firstRow.querySelector<HTMLTableCellElement>('.machine-cell')!.click();
+
+    expect(viewed).toEqual([CERTIFICATES[0]]);
+
+    viewed.length = 0;
+
+    firstRow
+      .querySelector<HTMLButtonElement>('[aria-label="Просмотреть акт: CNC milling machine"]')!
+      .click();
+
+    expect(viewed).toEqual([CERTIFICATES[0]]);
+
+    viewed.length = 0;
 
     const rowCheckbox = element.querySelector<HTMLInputElement>(
       '[aria-label="Select Industrial lathe"]',
     );
-    rowCheckbox!.checked = true;
-    rowCheckbox!.dispatchEvent(new Event('change', { bubbles: true }));
+    rowCheckbox!.click();
     fixture.detectChanges();
 
-    element.querySelector<HTMLButtonElement>('[aria-label="Edit CNC milling machine"]')!.click();
-    element.querySelector<HTMLButtonElement>('[aria-label="Delete Industrial lathe"]')!.click();
+    firstRow.querySelector<HTMLButtonElement>('[aria-label="Edit CNC milling machine"]')!.click();
+    secondRow.querySelector<HTMLButtonElement>('[aria-label="Delete Industrial lathe"]')!.click();
 
+    expect(viewed).toEqual([]);
     expect(edited).toEqual([CERTIFICATES[0]]);
     expect(deleted).toEqual([CERTIFICATES[1]]);
     expect(element.textContent).toContain('1 selected');

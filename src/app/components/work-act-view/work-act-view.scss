@@ -1,0 +1,242 @@
+:host {
+  display: block;
+}
+
+.act-view {
+  overflow: hidden;
+  border: 1px solid var(--tui-border-normal);
+  border-radius: 1.25rem;
+  background: var(--tui-background-base);
+  box-shadow: 0 1rem 3rem rgb(26 36 48 / 8%);
+}
+
+.act-header {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1.25rem;
+  align-items: start;
+  padding: 1.5rem;
+}
+
+.act-heading {
+  min-inline-size: 0;
+}
+
+.meta-label {
+  color: var(--tui-text-secondary);
+}
+
+h1 {
+  margin: 0;
+  font: var(--tui-typography-heading-4);
+}
+
+.condition {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 1.75rem;
+  padding-inline: 0.75rem;
+  border-radius: 999px;
+  color: var(--tui-status-positive);
+  background: var(--tui-background-positive-1);
+  font: var(--tui-typography-ui-s);
+}
+
+tui-tabs {
+  padding-inline: 1.5rem;
+  border-block: 1px solid var(--tui-border-normal);
+}
+
+.act-sheet {
+  display: grid;
+  gap: 2rem;
+  padding: clamp(1rem, 3vw, 2rem);
+}
+
+.document-meta {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-column: 1 / -1;
+  gap: 2rem;
+  margin: 0;
+  padding: 1.25rem;
+  border-radius: 1rem;
+  background: var(--tui-background-neutral-1);
+}
+
+.document-meta > div,
+.post-repair-grid > div,
+.signatures > div {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.document-meta dt,
+.document-meta dd {
+  margin: 0;
+}
+
+.document-meta dt,
+.meta-label {
+  font: var(--tui-typography-ui-s);
+}
+
+.document-meta dd {
+  font-weight: 600;
+}
+
+.act-section {
+  display: grid;
+  gap: 1rem;
+}
+
+.section-heading {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.section-heading > span {
+  display: grid;
+  place-items: center;
+  inline-size: 2rem;
+  block-size: 2rem;
+  border-radius: 0.625rem;
+  color: #fff;
+  background: var(--tui-background-accent-1-hover);
+  font: var(--tui-typography-ui-s);
+}
+
+h2 {
+  margin: 0;
+  font: var(--tui-typography-heading-6);
+}
+
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--tui-border-normal);
+  border-radius: 0.875rem;
+}
+
+.table-scroll:focus-visible {
+  outline: 0.125rem solid var(--tui-border-focus);
+  outline-offset: 0.125rem;
+}
+
+.data-table {
+  inline-size: 100%;
+  min-inline-size: 42rem;
+  border-collapse: collapse;
+  font: var(--tui-typography-body-s);
+}
+
+.materials-table {
+  min-inline-size: 42rem;
+}
+
+.required-table {
+  min-inline-size: 24rem;
+}
+
+caption {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+th,
+td {
+  padding: 0.875rem 1rem;
+  border-block-end: 1px solid var(--tui-border-normal);
+  text-align: start;
+  vertical-align: top;
+}
+
+thead th {
+  color: var(--tui-text-secondary);
+  background: var(--tui-background-neutral-1);
+  font: var(--tui-typography-ui-s);
+  white-space: nowrap;
+}
+
+tbody tr:last-child td,
+tfoot tr:last-child > * {
+  border-block-end: 0;
+}
+
+tbody strong,
+tbody small {
+  display: block;
+}
+
+tbody small {
+  margin-block-start: 0.25rem;
+  color: var(--tui-text-secondary);
+}
+
+tfoot {
+  background: var(--tui-background-neutral-1);
+  font-weight: 600;
+}
+
+.code {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+  background: var(--tui-background-neutral-1);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  white-space: nowrap;
+}
+
+.post-repair-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.post-repair-grid > div,
+.signatures > div {
+  padding: 1rem;
+  border: 1px solid var(--tui-border-normal);
+  border-radius: 0.875rem;
+}
+
+.condition {
+  justify-self: start;
+}
+
+.condition--negative {
+  color: var(--tui-status-negative);
+  background: var(--tui-background-negative-1);
+}
+
+.signatures {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 48rem) {
+  .act-header {
+    grid-template-columns: 1fr auto;
+  }
+
+  .act-heading {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .document-meta,
+  .post-repair-grid,
+  .signatures {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 32rem) {
+  .act-header,
+  tui-tabs {
+    padding-inline: 1rem;
+  }
+}

@@ -1,0 +1,221 @@
+<section class="act-view" aria-labelledby="act-title">
+  <header class="act-header">
+    <button
+      appearance="secondary"
+      iconStart="@tui.arrow-left"
+      size="s"
+      tuiButton
+      type="button"
+      (click)="backRequested.emit()"
+    >
+      Все акты
+    </button>
+
+    <div class="act-heading">
+      <h1 id="act-title">Акт выполненных работ</h1>
+    </div>
+
+    <dl class="document-meta">
+      <div>
+        <dt>Дата акта</dt>
+        <dd>{{ act().date | workActDate: 'medium' }}</dd>
+      </div>
+    </dl>
+  </header>
+
+  <tui-tabs
+    aria-label="Страницы акта"
+    role="tablist"
+    size="m"
+    [activeItemIndex]="activeTab()"
+    (activeItemIndexChange)="selectTab($event)"
+  >
+    <button
+      id="act-front-tab"
+      role="tab"
+      tuiTab
+      type="button"
+      aria-controls="act-front-panel"
+      [attr.aria-selected]="activeTab() === 0"
+      (click)="selectTab(0)"
+    >
+      Начало акта
+    </button>
+    <button
+      id="act-back-tab"
+      role="tab"
+      tuiTab
+      type="button"
+      aria-controls="act-back-panel"
+      [attr.aria-selected]="activeTab() === 1"
+      (click)="selectTab(1)"
+    >
+      Материалы и завершение
+    </button>
+  </tui-tabs>
+
+  @if (activeTab() === 0) {
+    <article id="act-front-panel" class="act-sheet" role="tabpanel" aria-labelledby="act-front-tab">
+      <section class="act-section" aria-labelledby="equipment-title">
+        <div class="section-heading">
+          <span>01</span>
+          <h2 id="equipment-title">Техника и заявка на ремонт</h2>
+        </div>
+        <div class="table-scroll" tabindex="0">
+          <table class="data-table equipment-table">
+            <caption>
+              Техника, принятая в ремонт
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">Инв. №</th>
+                <th scope="col">Наименование техники, модель</th>
+                <th scope="col">Причина ремонта</th>
+                <th scope="col">Показания счётчика моточасов</th>
+                <th scope="col">Бригада</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <span class="code">{{ act().equipment.inventoryNumber }}</span>
+                </td>
+                <td>
+                  <strong>{{ act().equipment.name }}</strong>
+                  <small>{{ act().equipment.model }}</small>
+                </td>
+                <td>{{ act().equipment.repairReason }}</td>
+                <td>{{ act().equipment.meterReading }}</td>
+                <td>{{ act().equipment.brigade.join(', ') }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="act-section" aria-labelledby="works-title">
+        <div class="section-heading">
+          <span>02</span>
+          <h2 id="works-title">Выполненные работы</h2>
+        </div>
+        <div class="table-scroll" tabindex="0">
+          <table class="data-table works-table">
+            <caption>
+              Список выполненных ремонтных работ
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Наименование работ</th>
+                <th scope="col">Моточасы</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (work of act().completedWorks; track work.id) {
+                <tr>
+                  <td>{{ work.id }}</td>
+                  <td>{{ work.name }}</td>
+                  <td>{{ work.laborHours | workActNumber: 'hours' }}</td>
+                </tr>
+              }
+            </tbody>
+            <tfoot>
+              <tr>
+                <th scope="row" colspan="2">Итого</th>
+                <td>{{ totalWorkHours() | workActNumber: 'hours' }} м/ч</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </section>
+    </article>
+  } @else {
+    <article id="act-back-panel" class="act-sheet" role="tabpanel" aria-labelledby="act-back-tab">
+      <section class="act-section" aria-labelledby="materials-title">
+        <div class="section-heading">
+          <span>03</span>
+          <h2 id="materials-title">Запасные части и использованные материалы</h2>
+        </div>
+        <div class="table-scroll" tabindex="0">
+          <table class="data-table materials-table">
+            <caption>
+              Запасные части и материалы, использованные при ремонте
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Наименование</th>
+                <th scope="col">Код товара</th>
+                <th scope="col">Ед. изм.</th>
+                <th scope="col">Кол-во</th>
+                <th scope="col">Гарантия</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (material of act().materials; track material.id) {
+                <tr>
+                  <td>{{ material.id }}</td>
+                  <td>{{ material.name }}</td>
+                  <td>
+                    <span class="code">{{ material.itemCode }}</span>
+                  </td>
+                  <td>{{ material.unit }}</td>
+                  <td>{{ material.quantity }}</td>
+                  <td>{{ material.paymentSource === 'warranty' ? 'Да' : '—' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="act-section" aria-labelledby="post-repair-title">
+        <div class="section-heading">
+          <span>04</span>
+          <h2 id="post-repair-title">Информация после ремонта</h2>
+        </div>
+        <div class="post-repair-grid">
+          <div>
+            <span class="meta-label">Состояние техники</span>
+            <strong class="condition" [class.condition--negative]="!act().postRepair.operational">
+              {{ act().postRepair.operational ? 'Рабочее' : 'Нерабочее' }}
+            </strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="act-section" aria-labelledby="required-works-title">
+        <div class="section-heading">
+          <span>05</span>
+          <h2 id="required-works-title">Необходимые виды работ</h2>
+        </div>
+        <div class="table-scroll" tabindex="0">
+          <table class="data-table required-table">
+            <caption>
+              Необходимые виды работ после ремонта
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">Необходимые виды работ</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (work of act().requiredWorks; track work.id) {
+                <tr>
+                  <td>{{ work.workType }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="signatures" aria-labelledby="performers-title">
+        <div>
+          <span class="meta-label" id="performers-title">Исполнители</span>
+          <strong>{{ act().performers.join(', ') }}</strong>
+        </div>
+      </section>
+    </article>
+  }
+</section>

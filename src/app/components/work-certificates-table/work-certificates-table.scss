@@ -103,8 +103,16 @@ table {
   outline-offset: 0.125rem;
 }
 
+.certificate-row {
+  cursor: pointer;
+}
+
+.certificate-row:hover {
+  background: var(--tui-background-neutral-1-hover);
+}
+
 .actions-column {
-  inline-size: 7rem;
+  inline-size: 9rem;
 }
 
 .machine-cell {
