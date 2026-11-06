@@ -31,6 +31,7 @@ const ACT: WorkAct = {
       quantity: 1,
       unitPrice: 128,
       paymentSource: 'customer',
+      receivedBy: 'Alex Morgan',
     },
     {
       id: 2,
@@ -40,6 +41,7 @@ const ACT: WorkAct = {
       quantity: 5,
       unitPrice: 9.8,
       paymentSource: 'warranty',
+      receivedBy: 'Maya Chen',
     },
   ],
   requiredWorks: [
@@ -193,6 +195,7 @@ describe('WorkActView', () => {
       'Ед. изм.',
       'Кол-во',
       'Гарантия',
+      'Получил',
       'Действия',
     ]);
     expect(element.querySelector('.materials-table tfoot')).toBeNull();
@@ -360,6 +363,15 @@ describe('WorkActView', () => {
 
     paymentSource.value = 'warranty';
     paymentSource.dispatchEvent(new Event('change', { bubbles: true }));
+    const receivedBy = element.querySelector<HTMLSelectElement>('[aria-label="Материал получил"]')!;
+
+    expect(Array.from(receivedBy.options, (option) => option.textContent?.trim())).toEqual([
+      'Alex Morgan',
+      'Maya Chen',
+    ]);
+
+    receivedBy.value = 'Maya Chen';
+    receivedBy.dispatchEvent(new Event('change', { bubbles: true }));
     element.querySelector<HTMLFormElement>('.material-edit-form')!.requestSubmit();
     await stabilize();
 
@@ -372,6 +384,7 @@ describe('WorkActView', () => {
       quantity: 2,
       unitPrice: 0,
       paymentSource: 'warranty',
+      receivedBy: 'Maya Chen',
     });
 
     element
@@ -389,6 +402,7 @@ describe('WorkActView', () => {
 
     expect(edited.quantity).toBe(3);
     expect(edited.unitPrice).toBe(128);
+    expect(edited.receivedBy).toBe('Alex Morgan');
 
     element
       .querySelector<HTMLButtonElement>('[aria-label="Удалить материал: Воздушный фильтр"]')!

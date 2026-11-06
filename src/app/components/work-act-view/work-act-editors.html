@@ -182,9 +182,17 @@
         <option value="warranty">Гарантия</option>
       </select>
     </label>
+    <label class="dialog-field">
+      <span>Материал получил</span>
+      <select aria-label="Материал получил" formControlName="receivedBy" required>
+        @for (employee of act().equipment.brigade; track $index) {
+          <option [value]="employee">{{ employee }}</option>
+        }
+      </select>
+    </label>
     @if (materialForm.invalid && materialForm.touched) {
       <p class="form-error" role="alert">
-        Заполните сведения о материале и укажите положительное количество.
+        Заполните сведения о материале, выберите получателя и укажите положительное количество.
       </p>
     }
     <footer class="dialog-actions">

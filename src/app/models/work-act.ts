@@ -29,6 +29,7 @@ export interface WorkActMaterial {
   readonly quantity: number;
   readonly unitPrice: number;
   readonly paymentSource: WorkActPaymentSource;
+  readonly receivedBy: string;
 }
 
 export interface WorkActRequiredWork {

@@ -137,6 +137,7 @@ describe('App', () => {
           quantity: 1,
           unitPrice: 0,
           paymentSource: 'warranty',
+          receivedBy: 'Grace Hopper',
         },
       ],
       performers: ['Grace Hopper'],
@@ -189,6 +190,7 @@ describe('App', () => {
       name: 'Hydraulic seal',
       itemCode: 'SEAL-42',
       paymentSource: 'warranty',
+      receivedBy: 'Grace Hopper',
     });
   });
 

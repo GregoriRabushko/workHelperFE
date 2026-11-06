@@ -216,6 +216,7 @@
                 <th scope="col">Ед. изм.</th>
                 <th scope="col">Кол-во</th>
                 <th scope="col">Гарантия</th>
+                <th scope="col">Получил</th>
                 <th scope="col" class="actions-column">Действия</th>
               </tr>
             </thead>
@@ -230,6 +231,7 @@
                   <td>{{ material.unit }}</td>
                   <td>{{ material.quantity }}</td>
                   <td>{{ material.paymentSource === 'warranty' ? 'Да' : '—' }}</td>
+                  <td>{{ material.receivedBy }}</td>
                   <td class="actions-column">
                     <div class="row-actions">
                       <button
@@ -261,7 +263,7 @@
                 </tr>
               } @empty {
                 <tr>
-                  <td class="empty-state" colspan="7">Материалы не добавлены</td>
+                  <td class="empty-state" colspan="8">Материалы не добавлены</td>
                 </tr>
               }
             </tbody>

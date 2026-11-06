@@ -93,6 +93,7 @@ export class WorkActEditors {
     unit: new FormControl('', { nonNullable: true, validators: [nonBlank] }),
     quantity: new FormControl(1, { nonNullable: true, validators: [positiveNumber] }),
     paymentSource: new FormControl<WorkActPaymentSource>('customer', { nonNullable: true }),
+    receivedBy: new FormControl('', { nonNullable: true, validators: [nonBlank] }),
   });
   protected readonly requiredWorkForm = new FormGroup({
     workType: new FormControl('', { nonNullable: true, validators: [nonBlank] }),
@@ -136,6 +137,10 @@ export class WorkActEditors {
   }
 
   openMaterialEditor(material: WorkActMaterial | null = null): void {
+    const brigade = this.act().equipment.brigade;
+    const receivedBy =
+      material && brigade.includes(material.receivedBy) ? material.receivedBy : (brigade[0] ?? '');
+
     this.materialTarget.set(material);
     this.materialForm.reset({
       name: material?.name ?? '',
@@ -143,6 +148,7 @@ export class WorkActEditors {
       unit: material?.unit ?? '',
       quantity: material?.quantity ?? 1,
       paymentSource: material?.paymentSource ?? 'customer',
+      receivedBy,
     });
     this.materialDialogOpen.set(true);
   }
@@ -263,6 +269,7 @@ export class WorkActEditors {
       quantity: value.quantity,
       unitPrice: target?.unitPrice ?? 0,
       paymentSource: value.paymentSource,
+      receivedBy: value.receivedBy,
     };
 
     this.actUpdated.emit({
