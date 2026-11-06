@@ -64,6 +64,16 @@ const hasEmployee: ValidatorFn = (control: AbstractControl): ValidationErrors | 
     ? null
     : { required: true };
 
+function toCertificate(act: WorkAct): WorkCertificate {
+  return {
+    id: act.id,
+    date: act.date,
+    machineName: act.equipment.name,
+    inventoryNumber: act.equipment.inventoryNumber,
+    employees: act.performers.length ? act.performers : act.equipment.brigade,
+  };
+}
+
 @Component({
   selector: 'app-root',
   imports: [
@@ -82,8 +92,14 @@ const hasEmployee: ValidatorFn = (control: AbstractControl): ValidationErrors | 
 export class App {
   private readonly dialogs = inject(TuiDialogService);
 
-  protected readonly certificates = signal(INITIAL_CERTIFICATES);
-  protected readonly selectedAct = signal<WorkAct | null>(null);
+  protected readonly acts = signal<readonly WorkAct[]>(INITIAL_CERTIFICATES.map(createWorkAct));
+  protected readonly certificates = computed(() => this.acts().map(toCertificate));
+  protected readonly selectedActId = signal<number | null>(null);
+  protected readonly selectedAct = computed(() => {
+    const selectedId = this.selectedActId();
+
+    return selectedId === null ? null : (this.acts().find(({ id }) => id === selectedId) ?? null);
+  });
   protected readonly editTarget = signal<WorkCertificate | null>(null);
   protected readonly editDialogOpen = signal(false);
   protected readonly formMode = signal<'create' | 'edit'>('edit');
@@ -126,11 +142,15 @@ export class App {
   }
 
   protected handleView(certificate: WorkCertificate): void {
-    this.selectedAct.set(createWorkAct(certificate));
+    this.selectedActId.set(certificate.id);
+  }
+
+  protected handleActUpdated(updated: WorkAct): void {
+    this.acts.update((current) => current.map((act) => (act.id === updated.id ? updated : act)));
   }
 
   protected closeAct(): void {
-    this.selectedAct.set(null);
+    this.selectedActId.set(null);
   }
 
   protected handleDelete(certificate: WorkCertificate): void {
@@ -210,21 +230,31 @@ export class App {
     };
 
     if (this.formMode() === 'create') {
-      this.certificates.update((current) => [
-        ...current,
-        {
+      this.acts.update((current) => {
+        const certificate: WorkCertificate = {
           id: current.reduce((highestId, { id }) => Math.max(highestId, id), 0) + 1,
           ...certificateData,
-        },
-      ]);
-    } else if (target) {
-      const updated: WorkCertificate = {
-        ...target,
-        ...certificateData,
-      };
+        };
 
-      this.certificates.update((current) =>
-        current.map((certificate) => (certificate.id === updated.id ? updated : certificate)),
+        return [...current, createWorkAct(certificate)];
+      });
+    } else if (target) {
+      this.acts.update((current) =>
+        current.map((act) =>
+          act.id === target.id
+            ? {
+                ...act,
+                date: certificateData.date,
+                equipment: {
+                  ...act.equipment,
+                  inventoryNumber: certificateData.inventoryNumber,
+                  name: certificateData.machineName,
+                  brigade: certificateData.employees,
+                },
+                performers: certificateData.employees,
+              }
+            : act,
+        ),
       );
     } else {
       return;
@@ -240,8 +270,13 @@ export class App {
   private deleteCertificates(certificates: readonly WorkCertificate[]): void {
     const deletedIds = new Set(certificates.map(({ id }) => id));
     const editTarget = this.editTarget();
+    const selectedActId = this.selectedActId();
 
-    this.certificates.update((current) => current.filter(({ id }) => !deletedIds.has(id)));
+    this.acts.update((current) => current.filter(({ id }) => !deletedIds.has(id)));
+
+    if (selectedActId !== null && deletedIds.has(selectedActId)) {
+      this.closeAct();
+    }
 
     if (editTarget && deletedIds.has(editTarget.id)) {
       this.closeEditDialog();

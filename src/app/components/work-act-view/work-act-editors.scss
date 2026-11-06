@@ -1,0 +1,83 @@
+:host {
+  display: contents;
+}
+
+.dialog-form {
+  display: grid;
+  gap: 1rem;
+  inline-size: min(42rem, 100%);
+}
+
+.dialog-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.dialog-field {
+  display: grid;
+  gap: 0.375rem;
+  color: var(--tui-text-primary);
+  font: var(--tui-typography-ui-s);
+}
+
+.dialog-field--wide {
+  grid-column: 1 / -1;
+}
+
+.dialog-field small {
+  color: var(--tui-text-secondary);
+  font: var(--tui-typography-body-s);
+}
+
+.dialog-field select {
+  block-size: var(--tui-height-m);
+  inline-size: 100%;
+  padding-inline: 0.75rem;
+  border: 1px solid var(--tui-border-normal);
+  border-radius: 0.75rem;
+  color: var(--tui-text-primary);
+  background: var(--tui-background-base);
+  font: inherit;
+}
+
+.dialog-field select:focus-visible {
+  outline: 0.125rem solid var(--tui-border-focus);
+  outline-offset: 0.125rem;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-block-start: 0.5rem;
+}
+
+.form-error {
+  margin: 0;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  color: var(--tui-text-negative);
+  background: var(--tui-background-negative-1);
+  font: var(--tui-typography-body-s);
+}
+
+@media (max-width: 48rem) {
+  .dialog-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dialog-field--wide {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 32rem) {
+  .dialog-actions {
+    flex-direction: column-reverse;
+  }
+
+  .dialog-actions button {
+    inline-size: 100%;
+  }
+}

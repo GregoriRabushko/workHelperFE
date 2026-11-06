@@ -40,7 +40,7 @@ export interface WorkActRequiredWork {
 }
 
 export interface WorkActPostRepair {
-  readonly operational: boolean;
+  readonly operational: boolean | null;
   readonly acceptance: string;
   readonly notes: string;
   readonly seniorMaster: string;

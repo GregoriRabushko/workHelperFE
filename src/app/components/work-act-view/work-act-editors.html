@@ -1,0 +1,235 @@
+<ng-template
+  [tuiDialog]="actDialogOpen()"
+  [tuiDialogOptions]="actDialogOptions"
+  (tuiDialogChange)="actDialogOpen.set($event)"
+>
+  <form class="dialog-form act-edit-form" novalidate [formGroup]="actForm" (ngSubmit)="saveAct()">
+    <div class="dialog-grid">
+      <label class="dialog-field">
+        <span>Дата акта</span>
+        <tui-textfield>
+          <input aria-label="Дата акта" formControlName="date" required tuiInput type="date" />
+        </tui-textfield>
+      </label>
+      <label class="dialog-field">
+        <span>Наименование техники</span>
+        <tui-textfield>
+          <input
+            aria-label="Наименование техники"
+            formControlName="equipmentName"
+            required
+            tuiInput
+          />
+        </tui-textfield>
+      </label>
+      <label class="dialog-field">
+        <span>Инвентарный номер</span>
+        <tui-textfield>
+          <input
+            aria-label="Инвентарный номер"
+            formControlName="inventoryNumber"
+            required
+            tuiInput
+          />
+        </tui-textfield>
+      </label>
+      <label class="dialog-field">
+        <span>Модель</span>
+        <tui-textfield>
+          <input aria-label="Модель техники" formControlName="model" required tuiInput />
+        </tui-textfield>
+      </label>
+      <label class="dialog-field dialog-field--wide">
+        <span>Причина ремонта</span>
+        <tui-textfield>
+          <input aria-label="Причина ремонта" formControlName="repairReason" required tuiInput />
+        </tui-textfield>
+      </label>
+      <label class="dialog-field">
+        <span>Показания счётчика</span>
+        <tui-textfield>
+          <input aria-label="Показания счётчика" formControlName="meterReading" required tuiInput />
+        </tui-textfield>
+      </label>
+      <label class="dialog-field">
+        <span>Бригада и исполнители</span>
+        <tui-textfield>
+          <input
+            aria-describedby="performers-hint"
+            aria-label="Бригада и исполнители"
+            formControlName="performers"
+            required
+            tuiInput
+          />
+        </tui-textfield>
+        <small id="performers-hint">Укажите несколько сотрудников через запятую.</small>
+      </label>
+      <label class="dialog-field dialog-field--wide">
+        <span>Состояние техники</span>
+        <select aria-label="Состояние техники" formControlName="operational">
+          <option [ngValue]="null">Не указано</option>
+          <option [ngValue]="true">Рабочее</option>
+          <option [ngValue]="false">Нерабочее</option>
+        </select>
+      </label>
+    </div>
+    @if (actForm.invalid && actForm.touched) {
+      <p class="form-error" role="alert">Заполните все обязательные поля акта.</p>
+    }
+    <footer class="dialog-actions">
+      <button appearance="secondary" tuiButton type="button" (click)="closeDialog('act')">
+        Отмена
+      </button>
+      <button tuiButton type="submit">Сохранить</button>
+    </footer>
+  </form>
+</ng-template>
+
+<ng-template
+  [tuiDialog]="workDialogOpen()"
+  [tuiDialogOptions]="workDialogOptions()"
+  (tuiDialogChange)="workDialogOpen.set($event)"
+>
+  <form
+    class="dialog-form work-edit-form"
+    novalidate
+    [formGroup]="workForm"
+    (ngSubmit)="saveWork()"
+  >
+    <label class="dialog-field">
+      <span>Наименование работы</span>
+      <tui-textfield>
+        <input aria-label="Наименование работы" formControlName="name" required tuiInput />
+      </tui-textfield>
+    </label>
+    <label class="dialog-field">
+      <span>Моточасы</span>
+      <tui-textfield>
+        <input
+          aria-label="Моточасы"
+          formControlName="laborHours"
+          min="0.1"
+          required
+          step="0.1"
+          tuiInput
+          type="number"
+        />
+      </tui-textfield>
+    </label>
+    @if (workForm.invalid && workForm.touched) {
+      <p class="form-error" role="alert">
+        Укажите наименование работы и положительное количество моточасов.
+      </p>
+    }
+    <footer class="dialog-actions">
+      <button appearance="secondary" tuiButton type="button" (click)="closeDialog('work')">
+        Отмена
+      </button>
+      <button tuiButton type="submit">
+        {{ workTarget() ? 'Сохранить' : 'Добавить' }}
+      </button>
+    </footer>
+  </form>
+</ng-template>
+
+<ng-template
+  [tuiDialog]="materialDialogOpen()"
+  [tuiDialogOptions]="materialDialogOptions()"
+  (tuiDialogChange)="materialDialogOpen.set($event)"
+>
+  <form
+    class="dialog-form material-edit-form"
+    novalidate
+    [formGroup]="materialForm"
+    (ngSubmit)="saveMaterial()"
+  >
+    <label class="dialog-field">
+      <span>Наименование материала</span>
+      <tui-textfield>
+        <input aria-label="Наименование материала" formControlName="name" required tuiInput />
+      </tui-textfield>
+    </label>
+    <label class="dialog-field">
+      <span>Код товара</span>
+      <tui-textfield>
+        <input aria-label="Код товара" formControlName="itemCode" required tuiInput />
+      </tui-textfield>
+    </label>
+    <label class="dialog-field">
+      <span>Единица измерения</span>
+      <tui-textfield>
+        <input aria-label="Единица измерения" formControlName="unit" required tuiInput />
+      </tui-textfield>
+    </label>
+    <label class="dialog-field">
+      <span>Количество</span>
+      <tui-textfield>
+        <input
+          aria-label="Количество материала"
+          formControlName="quantity"
+          min="0.01"
+          required
+          step="0.01"
+          tuiInput
+          type="number"
+        />
+      </tui-textfield>
+    </label>
+    <label class="dialog-field">
+      <span>Источник оплаты</span>
+      <select aria-label="Источник оплаты" formControlName="paymentSource">
+        <option value="customer">Заказчик</option>
+        <option value="warranty">Гарантия</option>
+      </select>
+    </label>
+    @if (materialForm.invalid && materialForm.touched) {
+      <p class="form-error" role="alert">
+        Заполните сведения о материале и укажите положительное количество.
+      </p>
+    }
+    <footer class="dialog-actions">
+      <button appearance="secondary" tuiButton type="button" (click)="closeDialog('material')">
+        Отмена
+      </button>
+      <button tuiButton type="submit">
+        {{ materialTarget() ? 'Сохранить' : 'Добавить' }}
+      </button>
+    </footer>
+  </form>
+</ng-template>
+
+<ng-template
+  [tuiDialog]="requiredWorkDialogOpen()"
+  [tuiDialogOptions]="requiredWorkDialogOptions()"
+  (tuiDialogChange)="requiredWorkDialogOpen.set($event)"
+>
+  <form
+    class="dialog-form required-work-edit-form"
+    novalidate
+    [formGroup]="requiredWorkForm"
+    (ngSubmit)="saveRequiredWork()"
+  >
+    <label class="dialog-field">
+      <span>Описание необходимой работы</span>
+      <tui-textfield>
+        <input
+          aria-label="Описание необходимой работы"
+          formControlName="workType"
+          required
+          tuiInput
+        />
+      </tui-textfield>
+    </label>
+    @if (requiredWorkForm.invalid && requiredWorkForm.touched) {
+      <p class="form-error" role="alert">Укажите описание необходимой работы.</p>
+    }
+    <footer class="dialog-actions">
+      <button appearance="secondary" tuiButton type="button" (click)="closeDialog('requiredWork')">
+        Отмена
+      </button>
+      <button tuiButton type="submit">
+        {{ requiredWorkTarget() ? 'Сохранить' : 'Добавить' }}
+      </button>
+    </footer>
+  </form>
+</ng-template>

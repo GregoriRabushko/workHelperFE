@@ -3,6 +3,7 @@ import { By } from '@angular/platform-browser';
 import { provideTaiga } from '@taiga-ui/core';
 
 import { App } from './app';
+import { WorkActView } from './components/work-act-view/work-act-view';
 import { WorkCertificatesTable } from './components/work-certificates-table/work-certificates-table';
 
 async function renderApp(): Promise<ComponentFixture<App>> {
@@ -26,6 +27,10 @@ function findLastButton(root: HTMLElement, label: string): HTMLButtonElement | u
 function getCertificatesTable(fixture: ComponentFixture<App>): WorkCertificatesTable {
   return fixture.debugElement.query(By.directive(WorkCertificatesTable))
     .componentInstance as WorkCertificatesTable;
+}
+
+function getActView(fixture: ComponentFixture<App>): WorkActView {
+  return fixture.debugElement.query(By.directive(WorkActView)).componentInstance as WorkActView;
 }
 
 describe('App', () => {
@@ -96,6 +101,97 @@ describe('App', () => {
     expect(compiled.textContent).toContain('Certificates of work performed');
   });
 
+  it('persists edited act data and keeps the main table in sync', async () => {
+    const fixture = await renderApp();
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    const hydraulicPressRow = Array.from(
+      compiled.querySelectorAll<HTMLTableRowElement>('tbody tr'),
+    ).find((row) => row.textContent?.includes('Hydraulic press'))!;
+
+    hydraulicPressRow.querySelector<HTMLTableCellElement>('.machine-cell')!.click();
+    fixture.detectChanges();
+
+    const view = getActView(fixture);
+    const current = view.act();
+
+    view.actUpdated.emit({
+      ...current,
+      date: '2026-11-06',
+      equipment: {
+        ...current.equipment,
+        inventoryNumber: 'PRS-UPDATED',
+        name: 'Updated hydraulic press',
+        model: 'HP-42',
+        repairReason: 'Hydraulic leak',
+        meterReading: '4300 м/ч',
+        brigade: ['Grace Hopper'],
+      },
+      completedWorks: [{ id: 1, name: 'Replace hydraulic seal', laborHours: 2.5 }],
+      materials: [
+        {
+          id: 1,
+          name: 'Hydraulic seal',
+          itemCode: 'SEAL-42',
+          unit: 'шт.',
+          quantity: 1,
+          unitPrice: 0,
+          paymentSource: 'warranty',
+        },
+      ],
+      performers: ['Grace Hopper'],
+    });
+    fixture.detectChanges();
+
+    const back = Array.from(compiled.querySelectorAll<HTMLButtonElement>('button')).find(
+      (button) => button.textContent?.trim() === 'Все акты',
+    )!;
+
+    back.click();
+    fixture.detectChanges();
+
+    expect(compiled.textContent).toContain('Updated hydraulic press');
+    expect(compiled.textContent).toContain('PRS-UPDATED');
+    expect(compiled.textContent).toContain('Grace Hopper');
+
+    compiled
+      .querySelector<HTMLButtonElement>('[aria-label="Edit Updated hydraulic press"]')!
+      .click();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const machineName = compiled.querySelector<HTMLInputElement>(
+      '[aria-label="Certificate machine name"]',
+    )!;
+
+    machineName.value = 'Table-edited hydraulic press';
+    machineName.dispatchEvent(new Event('input', { bubbles: true }));
+    compiled.querySelector<HTMLFormElement>('.edit-form')!.requestSubmit();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const updatedRow = Array.from(compiled.querySelectorAll<HTMLTableRowElement>('tbody tr')).find(
+      (row) => row.textContent?.includes('Table-edited hydraulic press'),
+    )!;
+
+    updatedRow.querySelector<HTMLTableCellElement>('.machine-cell')!.click();
+    fixture.detectChanges();
+
+    const reopened = getActView(fixture).act();
+
+    expect(reopened.equipment.name).toBe('Table-edited hydraulic press');
+    expect(reopened.completedWorks).toEqual([
+      { id: 1, name: 'Replace hydraulic seal', laborHours: 2.5 },
+    ]);
+    expect(reopened.materials[0]).toMatchObject({
+      name: 'Hydraulic seal',
+      itemCode: 'SEAL-42',
+      paymentSource: 'warranty',
+    });
+  });
+
   it('edits a certificate in the dialog', async () => {
     const fixture = await renderApp();
     const compiled = fixture.nativeElement as HTMLElement;
@@ -150,6 +246,46 @@ describe('App', () => {
     expect(compiled.querySelectorAll('tbody tr')).toHaveLength(6);
     expect(compiled.textContent).toContain('Packaging line');
     expect(compiled.textContent).toContain('Grace Hopper, Ada Lovelace');
+  });
+
+  it('does not assign works or materials to a newly created act', async () => {
+    const fixture = await renderApp();
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    getCertificatesTable(fixture).createRequested.emit();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const setInputValue = (label: string, value: string): void => {
+      const input = compiled.querySelector<HTMLInputElement>(`[aria-label="${label}"]`)!;
+
+      input.value = value;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+
+    setInputValue('Certificate date', '2026-11-06');
+    setInputValue('Certificate machine name', 'Empty packaging line');
+    setInputValue('Certificate inventory number', 'PKG-EMPTY');
+    setInputValue('Certificate employees', 'Grace Hopper');
+    compiled.querySelector<HTMLFormElement>('.edit-form')!.requestSubmit();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const createdRow = Array.from(compiled.querySelectorAll<HTMLTableRowElement>('tbody tr')).find(
+      (row) => row.textContent?.includes('Empty packaging line'),
+    )!;
+
+    createdRow.querySelector<HTMLTableCellElement>('.machine-cell')!.click();
+    fixture.detectChanges();
+
+    const createdAct = getActView(fixture).act();
+
+    expect(createdAct.completedWorks).toEqual([]);
+    expect(createdAct.materials).toEqual([]);
+    expect(createdAct.requiredWorks).toEqual([]);
+    expect(createdAct.postRepair.operational).toBeNull();
   });
 
   it('keeps a certificate when deletion is cancelled', async () => {

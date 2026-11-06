@@ -12,6 +12,7 @@ import { TuiButton } from '@taiga-ui/core';
 import { TuiTabs } from '@taiga-ui/kit';
 
 import { type WorkAct } from '../../models/work-act';
+import { WorkActEditors } from './work-act-editors';
 
 const ACT_DATE_FORMATTERS = {
   medium: new Intl.DateTimeFormat('ru-RU', {
@@ -45,7 +46,7 @@ class WorkActNumberPipe implements PipeTransform {
 
 @Component({
   selector: 'app-work-act-view',
-  imports: [TuiButton, TuiTabs, WorkActDatePipe, WorkActNumberPipe],
+  imports: [TuiButton, TuiTabs, WorkActDatePipe, WorkActEditors, WorkActNumberPipe],
   templateUrl: './work-act-view.html',
   styleUrl: './work-act-view.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -53,6 +54,7 @@ class WorkActNumberPipe implements PipeTransform {
 export class WorkActView {
   readonly act = input.required<WorkAct>();
   readonly backRequested = output<void>();
+  readonly actUpdated = output<WorkAct>();
 
   protected readonly activeTab = signal(0);
   protected readonly totalWorkHours = computed(() =>
