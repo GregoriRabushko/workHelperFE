@@ -62,6 +62,8 @@ export class WorkCertificatesTable {
   readonly viewRequested = output<WorkCertificate>();
   readonly editRequested = output<WorkCertificate>();
   readonly deleteRequested = output<WorkCertificate>();
+  readonly createRequested = output<void>();
+  readonly deleteSelectedRequested = output<readonly WorkCertificate[]>();
 
   protected readonly filters = new FormGroup({
     date: new FormControl('', { nonNullable: true }),
@@ -126,11 +128,12 @@ export class WorkCertificatesTable {
     );
   });
 
-  protected readonly selectedCount = computed(() => {
+  protected readonly selectedCertificates = computed(() => {
     const selectedIds = this.selectedIds();
 
-    return this.certificates().filter(({ id }) => selectedIds.has(id)).length;
+    return this.certificates().filter(({ id }) => selectedIds.has(id));
   });
+  protected readonly selectedCount = computed(() => this.selectedCertificates().length);
 
   protected readonly allVisibleSelected = computed(() => {
     const visible = this.filteredCertificates();
@@ -199,12 +202,24 @@ export class WorkCertificatesTable {
     this.editRequested.emit(certificate);
   }
 
+  protected requestCreate(): void {
+    this.createRequested.emit();
+  }
+
   protected requestView(certificate: WorkCertificate): void {
     this.viewRequested.emit(certificate);
   }
 
   protected requestDelete(certificate: WorkCertificate): void {
     this.deleteRequested.emit(certificate);
+  }
+
+  protected requestDeleteSelected(): void {
+    const selected = this.selectedCertificates();
+
+    if (selected.length) {
+      this.deleteSelectedRequested.emit(selected);
+    }
   }
 
   private normalize(value: string | null | undefined): string {

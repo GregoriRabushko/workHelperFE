@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import {
   type AbstractControl,
   FormControl,
@@ -86,10 +86,14 @@ export class App {
   protected readonly selectedAct = signal<WorkAct | null>(null);
   protected readonly editTarget = signal<WorkCertificate | null>(null);
   protected readonly editDialogOpen = signal(false);
-  protected readonly editDialogOptions = {
-    label: 'Edit certificate',
+  protected readonly formMode = signal<'create' | 'edit'>('edit');
+  protected readonly editDialogOptions = computed(() => ({
+    label: this.formMode() === 'create' ? 'Create act' : 'Edit certificate',
     size: 's' as const,
-  };
+  }));
+  protected readonly submitLabel = computed(() =>
+    this.formMode() === 'create' ? 'Create' : 'Save',
+  );
   protected readonly editForm = new FormGroup({
     date: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     machineName: new FormControl('', { nonNullable: true, validators: [nonBlank] }),
@@ -97,8 +101,21 @@ export class App {
     employees: new FormControl('', { nonNullable: true, validators: [hasEmployee] }),
   });
 
+  protected handleCreate(): void {
+    this.editTarget.set(null);
+    this.formMode.set('create');
+    this.editForm.reset({
+      date: '',
+      machineName: '',
+      inventoryNumber: '',
+      employees: '',
+    });
+    this.editDialogOpen.set(true);
+  }
+
   protected handleEdit(certificate: WorkCertificate): void {
     this.editTarget.set(certificate);
+    this.formMode.set('edit');
     this.editForm.reset({
       date: certificate.date,
       machineName: certificate.machineName,
@@ -135,6 +152,31 @@ export class App {
       });
   }
 
+  protected handleDeleteSelected(certificates: readonly WorkCertificate[]): void {
+    if (!certificates.length) {
+      return;
+    }
+
+    const count = certificates.length;
+
+    this.dialogs
+      .open<boolean>(TUI_CONFIRM, {
+        label: `Delete ${count} selected ${count === 1 ? 'certificate' : 'certificates'}?`,
+        size: 's',
+        data: {
+          content: `${count === 1 ? 'This certificate' : 'These certificates'} will be permanently removed. This action cannot be undone.`,
+          yes: 'Delete selected',
+          no: 'Cancel',
+          appearance: ['primary-destructive', 'secondary'],
+        },
+      })
+      .subscribe((confirmed) => {
+        if (confirmed) {
+          this.deleteCertificates(certificates);
+        }
+      });
+  }
+
   protected handleEditDialogChange(open: boolean): void {
     this.editDialogOpen.set(open);
 
@@ -151,14 +193,13 @@ export class App {
   protected saveCertificate(): void {
     const target = this.editTarget();
 
-    if (!target || this.editForm.invalid) {
+    if (this.editForm.invalid) {
       this.editForm.markAllAsTouched();
       return;
     }
 
     const value = this.editForm.getRawValue();
-    const updated: WorkCertificate = {
-      ...target,
+    const certificateData = {
       date: value.date,
       machineName: value.machineName.trim(),
       inventoryNumber: value.inventoryNumber.trim(),
@@ -168,16 +209,41 @@ export class App {
         .filter(Boolean),
     };
 
-    this.certificates.update((current) =>
-      current.map((certificate) => (certificate.id === updated.id ? updated : certificate)),
-    );
+    if (this.formMode() === 'create') {
+      this.certificates.update((current) => [
+        ...current,
+        {
+          id: current.reduce((highestId, { id }) => Math.max(highestId, id), 0) + 1,
+          ...certificateData,
+        },
+      ]);
+    } else if (target) {
+      const updated: WorkCertificate = {
+        ...target,
+        ...certificateData,
+      };
+
+      this.certificates.update((current) =>
+        current.map((certificate) => (certificate.id === updated.id ? updated : certificate)),
+      );
+    } else {
+      return;
+    }
+
     this.closeEditDialog();
   }
 
   private deleteCertificate(certificate: WorkCertificate): void {
-    this.certificates.update((current) => current.filter(({ id }) => id !== certificate.id));
+    this.deleteCertificates([certificate]);
+  }
 
-    if (this.editTarget()?.id === certificate.id) {
+  private deleteCertificates(certificates: readonly WorkCertificate[]): void {
+    const deletedIds = new Set(certificates.map(({ id }) => id));
+    const editTarget = this.editTarget();
+
+    this.certificates.update((current) => current.filter(({ id }) => !deletedIds.has(id)));
+
+    if (editTarget && deletedIds.has(editTarget.id)) {
       this.closeEditDialog();
     }
   }

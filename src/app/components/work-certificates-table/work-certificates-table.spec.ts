@@ -54,6 +54,50 @@ describe('WorkCertificatesTable', () => {
     expect(element.textContent).toContain('CNC milling machine');
     expect(element.textContent).toContain('Nov 3, 2026');
     expect(element.textContent).toContain('Alex Morgan, Maya Chen');
+    expect(element.querySelector('h1')?.textContent).toContain('Certificates of work performed');
+  });
+
+  it('requests creating a new act', () => {
+    let requested = 0;
+
+    fixture.componentInstance.createRequested.subscribe(() => requested++);
+
+    const create = Array.from(element.querySelectorAll<HTMLButtonElement>('button')).find(
+      (button) => button.textContent?.trim() === 'Create act',
+    );
+
+    expect(create).toBeDefined();
+    create!.click();
+
+    expect(requested).toBe(1);
+  });
+
+  it('requests deleting selected acts and stays disabled without a selection', () => {
+    const requests: (readonly WorkCertificate[])[] = [];
+
+    fixture.componentInstance.deleteSelectedRequested.subscribe((certificates) =>
+      requests.push(certificates),
+    );
+
+    const deleteSelected = Array.from(element.querySelectorAll<HTMLButtonElement>('button')).find(
+      (button) => button.textContent?.trim() === 'Delete selected',
+    );
+
+    expect(deleteSelected).toBeDefined();
+    expect(deleteSelected!.disabled).toBe(true);
+
+    const rowCheckbox = element.querySelector<HTMLInputElement>(
+      '[aria-label="Select CNC milling machine"]',
+    );
+
+    rowCheckbox!.checked = true;
+    rowCheckbox!.dispatchEvent(new Event('change', { bubbles: true }));
+    fixture.detectChanges();
+
+    expect(deleteSelected!.disabled).toBe(false);
+    deleteSelected!.click();
+
+    expect(requests).toEqual([[CERTIFICATES[0]]]);
   });
 
   it('filters rows by machine name without case sensitivity', () => {
