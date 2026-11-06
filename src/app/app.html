@@ -5,7 +5,9 @@
     } @else {
       <app-work-certificates-table
         [certificates]="certificates()"
+        (createRequested)="handleCreate()"
         (deleteRequested)="handleDelete($event)"
+        (deleteSelectedRequested)="handleDeleteSelected($event)"
         (editRequested)="handleEdit($event)"
         (viewRequested)="handleView($event)"
       />
@@ -14,7 +16,7 @@
 
   <ng-template
     [tuiDialog]="editDialogOpen()"
-    [tuiDialogOptions]="editDialogOptions"
+    [tuiDialogOptions]="editDialogOptions()"
     (tuiDialogChange)="handleEditDialogChange($event)"
   >
     <form class="edit-form" [formGroup]="editForm" (ngSubmit)="saveCertificate()">
@@ -73,7 +75,9 @@
         <button appearance="secondary" tuiButton type="button" (click)="closeEditDialog()">
           Cancel
         </button>
-        <button tuiButton type="submit" [disabled]="editForm.invalid">Save</button>
+        <button tuiButton type="submit" [disabled]="editForm.invalid">
+          {{ submitLabel() }}
+        </button>
       </footer>
     </form>
   </ng-template>

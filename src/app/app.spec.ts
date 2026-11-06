@@ -1,7 +1,9 @@
 import { type ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { provideTaiga } from '@taiga-ui/core';
 
 import { App } from './app';
+import { WorkCertificatesTable } from './components/work-certificates-table/work-certificates-table';
 
 async function renderApp(): Promise<ComponentFixture<App>> {
   const fixture = TestBed.createComponent(App);
@@ -19,6 +21,11 @@ function findLastButton(root: HTMLElement, label: string): HTMLButtonElement | u
   );
 
   return matches[matches.length - 1];
+}
+
+function getCertificatesTable(fixture: ComponentFixture<App>): WorkCertificatesTable {
+  return fixture.debugElement.query(By.directive(WorkCertificatesTable))
+    .componentInstance as WorkCertificatesTable;
 }
 
 describe('App', () => {
@@ -115,6 +122,36 @@ describe('App', () => {
     expect(compiled.textContent).not.toContain('Ready to edit');
   });
 
+  it('creates a new act from the dialog', async () => {
+    const fixture = await renderApp();
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    getCertificatesTable(fixture).createRequested.emit();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const setInputValue = (label: string, value: string): void => {
+      const input = compiled.querySelector<HTMLInputElement>(`[aria-label="${label}"]`)!;
+
+      input.value = value;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+
+    setInputValue('Certificate date', '2026-11-06');
+    setInputValue('Certificate machine name', 'Packaging line');
+    setInputValue('Certificate inventory number', 'PKG-0006');
+    setInputValue('Certificate employees', 'Grace Hopper, Ada Lovelace');
+    compiled.querySelector<HTMLFormElement>('.edit-form')!.requestSubmit();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(compiled.querySelectorAll('tbody tr')).toHaveLength(6);
+    expect(compiled.textContent).toContain('Packaging line');
+    expect(compiled.textContent).toContain('Grace Hopper, Ada Lovelace');
+  });
+
   it('keeps a certificate when deletion is cancelled', async () => {
     const fixture = await renderApp();
     const compiled = fixture.nativeElement as HTMLElement;
@@ -152,6 +189,45 @@ describe('App', () => {
     await fixture.whenStable();
     fixture.detectChanges();
 
+    expect(compiled.textContent).not.toContain('Hydraulic press');
+  });
+
+  it('keeps selected certificates when bulk deletion is cancelled', async () => {
+    const fixture = await renderApp();
+    const compiled = fixture.nativeElement as HTMLElement;
+    const table = getCertificatesTable(fixture);
+
+    table.deleteSelectedRequested.emit(table.certificates().slice(0, 2));
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    findLastButton(compiled, 'Cancel')!.click();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(compiled.textContent).toContain('CNC milling machine');
+    expect(compiled.textContent).toContain('Hydraulic press');
+  });
+
+  it('deletes selected certificates after one confirmation', async () => {
+    const fixture = await renderApp();
+    const compiled = fixture.nativeElement as HTMLElement;
+    const table = getCertificatesTable(fixture);
+
+    table.deleteSelectedRequested.emit(table.certificates().slice(0, 2));
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    findLastButton(compiled, 'Delete selected')!.click();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(compiled.querySelectorAll('tbody tr')).toHaveLength(3);
+    expect(compiled.textContent).not.toContain('CNC milling machine');
     expect(compiled.textContent).not.toContain('Hydraulic press');
   });
 });
