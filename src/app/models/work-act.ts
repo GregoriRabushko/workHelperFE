@@ -51,7 +51,6 @@ export interface WorkAct {
   readonly id: number;
   readonly number: string;
   readonly date: string;
-  readonly company: WorkActCompany;
   readonly equipment: WorkActEquipment;
   readonly completedWorks: readonly WorkActCompletedWork[];
   readonly materials: readonly WorkActMaterial[];

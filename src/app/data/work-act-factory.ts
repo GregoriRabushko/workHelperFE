@@ -6,11 +6,6 @@ export function createWorkAct(certificate: WorkCertificate): WorkAct {
     id: certificate.id,
     number: `WR-2026-${String(certificate.id).padStart(4, '0')}`,
     date: certificate.date,
-    company: {
-      name: 'ООО «ТРОС»',
-      address: 'Минский район, д. Королёв Стан, ул. Московская, 4',
-      phone: '+375 17 511-51-91',
-    },
     equipment: {
       inventoryNumber: certificate.inventoryNumber,
       name: certificate.machineName,

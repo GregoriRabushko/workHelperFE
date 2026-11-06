@@ -1,21 +1,17 @@
 <section class="table-card" aria-labelledby="work-certificates-title">
   <header class="table-header">
-    <div>
-      <p class="eyebrow">Work records</p>
-      <h1 id="work-certificates-title">Certificates of work performed</h1>
-      <p class="summary" aria-live="polite">
-        {{ filteredCertificates().length }} of {{ certificates().length }} records
-        <span aria-hidden="true">·</span>
-        {{ selectedCount() }} selected
-      </p>
-    </div>
+    <p class="summary" aria-live="polite">
+      {{ filteredCertificates().length }} of {{ certificates().length }} records
+      <span aria-hidden="true">·</span>
+      {{ selectedCount() }} selected
+    </p>
   </header>
 
   <form class="filters" [formGroup]="filters" aria-label="Table filters">
     <label class="filter-field">
       <span>Date</span>
       <tui-textfield tuiTextfieldSize="s">
-        <input aria-label="Filter by date" formControlName="date" tuiInput type="date" />
+        <input aria-label="Filter by date" formControlName="date" tuiInput type="date"/>
       </tui-textfield>
     </label>
 
@@ -86,23 +82,23 @@
         Certificates of work performed with sortable columns and row actions
       </caption>
       <thead>
-        <tr>
-          <th tuiTh scope="col" class="selection-column" [sorter]="null">
-            <input
-              class="selection-checkbox"
-              aria-label="Select all visible certificates"
-              type="checkbox"
-              [checked]="allVisibleSelected()"
-              [indeterminate]="someVisibleSelected()"
-              (change)="toggleAllVisible($event)"
-            />
-          </th>
-          <th tuiTh scope="col" [sorter]="dateSorter">Date</th>
-          <th tuiTh scope="col" [sorter]="machineSorter">Machine name</th>
-          <th tuiTh scope="col" [sorter]="inventorySorter">Inventory number</th>
-          <th tuiTh scope="col" [sorter]="employeesSorter">Employees</th>
-          <th tuiTh scope="col" class="actions-column" [sorter]="null">Actions</th>
-        </tr>
+      <tr>
+        <th tuiTh scope="col" class="selection-column" [sorter]="null">
+          <input
+            class="selection-checkbox"
+            aria-label="Select all visible certificates"
+            type="checkbox"
+            [checked]="allVisibleSelected()"
+            [indeterminate]="someVisibleSelected()"
+            (change)="toggleAllVisible($event)"
+          />
+        </th>
+        <th tuiTh scope="col" [sorter]="dateSorter">Date</th>
+        <th tuiTh scope="col" [sorter]="machineSorter">Machine name</th>
+        <th tuiTh scope="col" [sorter]="inventorySorter">Inventory number</th>
+        <th tuiTh scope="col" [sorter]="employeesSorter">Employees</th>
+        <th tuiTh scope="col" class="actions-column" [sorter]="null">Actions</th>
+      </tr>
       </thead>
 
       @let sortedCertificates = filteredCertificates() | tuiTableSort;
@@ -128,18 +124,6 @@
               <td tuiTd>{{ certificate.employees.join(', ') }}</td>
               <td tuiTd class="actions-column">
                 <div class="row-actions" (click)="$event.stopPropagation()">
-                  <button
-                    appearance="action"
-                    iconStart="@tui.eye"
-                    size="xs"
-                    tuiIconButton
-                    type="button"
-                    [attr.aria-label]="'Просмотреть акт: ' + certificate.machineName"
-                    [attr.title]="'Просмотреть акт: ' + certificate.machineName"
-                    (click)="requestView(certificate)"
-                  >
-                    Просмотр
-                  </button>
                   <button
                     appearance="action"
                     iconStart="@tui.pencil"
@@ -171,12 +155,12 @@
         </tbody>
       } @else {
         <tbody>
-          <tr>
-            <td tuiTd colspan="6" class="empty-state">
-              <strong>No certificates found</strong>
-              <span>Change or clear the filters to see more records.</span>
-            </td>
-          </tr>
+        <tr>
+          <td tuiTd colspan="6" class="empty-state">
+            <strong>No certificates found</strong>
+            <span>Change or clear the filters to see more records.</span>
+          </td>
+        </tr>
         </tbody>
       }
     </table>
