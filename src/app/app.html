@@ -1,7 +1,11 @@
 <tui-root>
   <main class="workspace">
     @if (selectedAct(); as act) {
-      <app-work-act-view [act]="act" (backRequested)="closeAct()" />
+      <app-work-act-view
+        [act]="act"
+        (actUpdated)="handleActUpdated($event)"
+        (backRequested)="closeAct()"
+      />
     } @else {
       <app-work-certificates-table
         [certificates]="certificates()"

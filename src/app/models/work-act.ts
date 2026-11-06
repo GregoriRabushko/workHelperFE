@@ -29,6 +29,7 @@ export interface WorkActMaterial {
   readonly quantity: number;
   readonly unitPrice: number;
   readonly paymentSource: WorkActPaymentSource;
+  readonly receivedBy: string;
 }
 
 export interface WorkActRequiredWork {
@@ -40,7 +41,7 @@ export interface WorkActRequiredWork {
 }
 
 export interface WorkActPostRepair {
-  readonly operational: boolean;
+  readonly operational: boolean | null;
   readonly acceptance: string;
   readonly notes: string;
   readonly seniorMaster: string;

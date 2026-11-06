@@ -1,4 +1,6 @@
 <section class="act-view" aria-labelledby="act-title">
+  <app-work-act-editors #editors [act]="act()" (actUpdated)="actUpdated.emit($event)" />
+
   <header class="act-header">
     <button
       appearance="secondary"
@@ -14,6 +16,17 @@
     <div class="act-heading">
       <h1 id="act-title">Акт выполненных работ</h1>
     </div>
+
+    <button
+      appearance="secondary"
+      iconStart="@tui.pencil"
+      size="s"
+      tuiButton
+      type="button"
+      (click)="editors.openActEditor()"
+    >
+      Редактировать сведения
+    </button>
 
     <dl class="document-meta">
       <div>
@@ -97,6 +110,16 @@
         <div class="section-heading">
           <span>02</span>
           <h2 id="works-title">Выполненные работы</h2>
+          <button
+            appearance="secondary"
+            iconStart="@tui.plus"
+            size="s"
+            tuiButton
+            type="button"
+            (click)="editors.openWorkEditor()"
+          >
+            Добавить работу
+          </button>
         </div>
         <div class="table-scroll" tabindex="0">
           <table class="data-table works-table">
@@ -108,6 +131,7 @@
                 <th scope="col">#</th>
                 <th scope="col">Наименование работ</th>
                 <th scope="col">Моточасы</th>
+                <th scope="col" class="actions-column">Действия</th>
               </tr>
             </thead>
             <tbody>
@@ -116,6 +140,38 @@
                   <td>{{ work.id }}</td>
                   <td>{{ work.name }}</td>
                   <td>{{ work.laborHours | workActNumber: 'hours' }}</td>
+                  <td class="actions-column">
+                    <div class="row-actions">
+                      <button
+                        appearance="action"
+                        iconStart="@tui.pencil"
+                        size="xs"
+                        tuiIconButton
+                        type="button"
+                        [attr.aria-label]="'Редактировать работу: ' + work.name"
+                        [attr.title]="'Редактировать работу: ' + work.name"
+                        (click)="editors.openWorkEditor(work)"
+                      >
+                        Редактировать
+                      </button>
+                      <button
+                        appearance="action"
+                        iconStart="@tui.trash"
+                        size="xs"
+                        tuiIconButton
+                        type="button"
+                        [attr.aria-label]="'Удалить работу: ' + work.name"
+                        [attr.title]="'Удалить работу: ' + work.name"
+                        (click)="editors.deleteWork(work)"
+                      >
+                        Удалить
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td class="empty-state" colspan="4">Выполненные работы не добавлены</td>
                 </tr>
               }
             </tbody>
@@ -123,6 +179,7 @@
               <tr>
                 <th scope="row" colspan="2">Итого</th>
                 <td>{{ totalWorkHours() | workActNumber: 'hours' }} м/ч</td>
+                <td class="actions-column"></td>
               </tr>
             </tfoot>
           </table>
@@ -135,6 +192,16 @@
         <div class="section-heading">
           <span>03</span>
           <h2 id="materials-title">Запасные части и использованные материалы</h2>
+          <button
+            appearance="secondary"
+            iconStart="@tui.plus"
+            size="s"
+            tuiButton
+            type="button"
+            (click)="editors.openMaterialEditor()"
+          >
+            Добавить материал
+          </button>
         </div>
         <div class="table-scroll" tabindex="0">
           <table class="data-table materials-table">
@@ -149,6 +216,8 @@
                 <th scope="col">Ед. изм.</th>
                 <th scope="col">Кол-во</th>
                 <th scope="col">Гарантия</th>
+                <th scope="col">Получил</th>
+                <th scope="col" class="actions-column">Действия</th>
               </tr>
             </thead>
             <tbody>
@@ -162,6 +231,39 @@
                   <td>{{ material.unit }}</td>
                   <td>{{ material.quantity }}</td>
                   <td>{{ material.paymentSource === 'warranty' ? 'Да' : '—' }}</td>
+                  <td>{{ material.receivedBy }}</td>
+                  <td class="actions-column">
+                    <div class="row-actions">
+                      <button
+                        appearance="action"
+                        iconStart="@tui.pencil"
+                        size="xs"
+                        tuiIconButton
+                        type="button"
+                        [attr.aria-label]="'Редактировать материал: ' + material.name"
+                        [attr.title]="'Редактировать материал: ' + material.name"
+                        (click)="editors.openMaterialEditor(material)"
+                      >
+                        Редактировать
+                      </button>
+                      <button
+                        appearance="action"
+                        iconStart="@tui.trash"
+                        size="xs"
+                        tuiIconButton
+                        type="button"
+                        [attr.aria-label]="'Удалить материал: ' + material.name"
+                        [attr.title]="'Удалить материал: ' + material.name"
+                        (click)="editors.deleteMaterial(material)"
+                      >
+                        Удалить
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td class="empty-state" colspan="8">Материалы не добавлены</td>
                 </tr>
               }
             </tbody>
@@ -177,8 +279,18 @@
         <div class="post-repair-grid">
           <div>
             <span class="meta-label">Состояние техники</span>
-            <strong class="condition" [class.condition--negative]="!act().postRepair.operational">
-              {{ act().postRepair.operational ? 'Рабочее' : 'Нерабочее' }}
+            <strong
+              class="condition"
+              [class.condition--negative]="act().postRepair.operational === false"
+              [class.condition--neutral]="act().postRepair.operational === null"
+            >
+              {{
+                act().postRepair.operational === null
+                  ? 'Не указано'
+                  : act().postRepair.operational
+                    ? 'Рабочее'
+                    : 'Нерабочее'
+              }}
             </strong>
           </div>
         </div>
@@ -188,6 +300,16 @@
         <div class="section-heading">
           <span>05</span>
           <h2 id="required-works-title">Необходимые виды работ</h2>
+          <button
+            appearance="secondary"
+            iconStart="@tui.plus"
+            size="s"
+            tuiButton
+            type="button"
+            (click)="editors.openRequiredWorkEditor()"
+          >
+            Добавить вид работ
+          </button>
         </div>
         <div class="table-scroll" tabindex="0">
           <table class="data-table required-table">
@@ -197,12 +319,45 @@
             <thead>
               <tr>
                 <th scope="col">Необходимые виды работ</th>
+                <th scope="col" class="actions-column">Действия</th>
               </tr>
             </thead>
             <tbody>
               @for (work of act().requiredWorks; track work.id) {
                 <tr>
                   <td>{{ work.workType }}</td>
+                  <td class="actions-column">
+                    <div class="row-actions">
+                      <button
+                        appearance="action"
+                        iconStart="@tui.pencil"
+                        size="xs"
+                        tuiIconButton
+                        type="button"
+                        [attr.aria-label]="'Редактировать вид работ: ' + work.workType"
+                        [attr.title]="'Редактировать вид работ: ' + work.workType"
+                        (click)="editors.openRequiredWorkEditor(work)"
+                      >
+                        Редактировать
+                      </button>
+                      <button
+                        appearance="action"
+                        iconStart="@tui.trash"
+                        size="xs"
+                        tuiIconButton
+                        type="button"
+                        [attr.aria-label]="'Удалить вид работ: ' + work.workType"
+                        [attr.title]="'Удалить вид работ: ' + work.workType"
+                        (click)="editors.deleteRequiredWork(work)"
+                      >
+                        Удалить
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td class="empty-state" colspan="2">Необходимые работы не добавлены</td>
                 </tr>
               }
             </tbody>

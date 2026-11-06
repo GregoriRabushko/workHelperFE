@@ -12,7 +12,7 @@
 
 .act-header {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto 1fr auto;
   gap: 1.25rem;
   align-items: start;
   padding: 1.5rem;
@@ -92,8 +92,13 @@ tui-tabs {
 
 .section-heading {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.75rem;
   align-items: center;
+}
+
+.section-heading > button {
+  margin-inline-start: auto;
 }
 
 .section-heading > span {
@@ -189,6 +194,24 @@ tfoot {
   white-space: nowrap;
 }
 
+.actions-column {
+  inline-size: 6rem;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.row-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.empty-state {
+  padding-block: 2rem;
+  color: var(--tui-text-secondary);
+  text-align: center;
+}
+
 .post-repair-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -211,6 +234,11 @@ tfoot {
   background: var(--tui-background-negative-1);
 }
 
+.condition--neutral {
+  color: var(--tui-text-secondary);
+  background: var(--tui-background-neutral-1);
+}
+
 .signatures {
   display: grid;
   grid-template-columns: 1fr;
@@ -220,6 +248,11 @@ tfoot {
 @media (max-width: 48rem) {
   .act-header {
     grid-template-columns: 1fr auto;
+  }
+
+  .act-header > button:last-of-type {
+    grid-column: 2;
+    grid-row: 1;
   }
 
   .act-heading {
@@ -238,5 +271,28 @@ tfoot {
   .act-header,
   tui-tabs {
     padding-inline: 1rem;
+  }
+
+  .act-header {
+    grid-template-columns: 1fr;
+  }
+
+  .act-header > button,
+  .section-heading > button {
+    inline-size: 100%;
+  }
+
+  .act-header > button:last-of-type {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .act-heading {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  .section-heading > button {
+    margin-inline-start: 0;
   }
 }
